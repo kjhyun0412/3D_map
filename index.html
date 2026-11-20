@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
 <meta name="color-scheme" content="light only">
 <title>올림픽공원 3D 보행지도</title>
@@ -37,12 +37,16 @@ button,select{font:inherit;color:inherit}
 .search2{position:relative;margin-bottom:8px}
 .search2 input{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-size:15px;min-height:46px;outline:none;background:#fff}
 .search2 input:focus{border-color:var(--mode)}
-#qres2{display:none;position:absolute;left:0;right:0;top:50px;z-index:3;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.2);max-height:38vh;overflow:auto}
-#qres2 button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:0;background:#fff;padding:11px 14px;min-height:46px;font-size:14.5px;cursor:pointer;border-bottom:1px solid #f0eee8}
-#qres2 .tag{margin-left:auto;font-size:12px;color:var(--sub);white-space:nowrap}
+#qres2,#qres3{display:none;position:absolute;left:0;right:0;top:50px;z-index:3;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.2);max-height:38vh;overflow:auto}
+#qres2 button,#qres3 button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:0;background:#fff;padding:11px 14px;min-height:46px;font-size:14.5px;cursor:pointer;border-bottom:1px solid #f0eee8}
+#qres2 .tag,#qres3 .tag{margin-left:auto;font-size:12px;color:var(--sub);white-space:nowrap}
 .fac{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .fac button{min-height:54px;border:1px solid var(--line);border-radius:12px;background:#fff;font-size:14.5px;font-weight:700;padding:8px 10px;cursor:pointer;line-height:1.25}
 .fac button.on{background:var(--mode);border-color:var(--mode);color:#fff}
+.profBox{margin:10px 0 4px}.profTtl{font-size:13px;font-weight:800;margin-bottom:2px}
+.subchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.subchips:empty{display:none}
+.subchips button{min-height:38px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:13.5px;font-weight:700;padding:6px 12px;cursor:pointer}
+.subchips button.on{background:var(--mode);border-color:var(--mode);color:#fff}
 .fac button.dis{background:#f1f1ee;color:#9a9a94;cursor:not-allowed;font-weight:500}
 #cands{display:flex;flex-direction:column;gap:8px}
 .rtag{position:fixed;transform:translate(-50%,-100%);z-index:6;color:#fff;font-size:12px;padding:4px 9px;border-radius:12px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3);white-space:nowrap;cursor:pointer;opacity:.92}
@@ -68,11 +72,12 @@ body.bigtext #sheet{zoom:1.22}
 .seg button.on[data-mode=old]{background:var(--old);color:#fff}
 
 /* bottom sheet (mobile) / side panel (desktop) */
-#sheet{position:fixed;left:0;right:0;bottom:0;z-index:7;background:var(--bg);border-radius:18px 18px 0 0;box-shadow:0 -6px 24px rgba(0,0,0,.16);
+html,body{touch-action:pan-x pan-y}   /* 화면 전체가 두 손가락으로 커지지 않게(지도 확대·축소는 지도 안에서만) */
+#sheet{touch-action:pan-y;position:fixed;left:0;right:0;bottom:0;z-index:7;background:var(--bg);border-radius:18px 18px 0 0;box-shadow:0 -6px 24px rgba(0,0,0,.16);
   max-height:78vh;height:var(--sheetH,200px);transition:height .25s ease;display:flex;flex-direction:column;padding-bottom:var(--safeB)}
-#grab{flex:none;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:none}
+#grab{flex:none;height:18px;display:flex;align-items:center;justify-content:center;pointer-events:none}
 #grab i{width:44px;height:5px;border-radius:3px;background:#cfccc4}
-#locRow{padding:10px 0 4px}   /* 요약(소요시간·가는 곳·상태·자세히 보기) 바로 아래 */
+#locRow{display:none!important}   /* 요약(소요시간·가는 곳·상태·자세히 보기) 바로 아래 */
 #locRow .btn.big{margin-bottom:0;min-height:48px}
 #scroll{overflow:auto;padding:0 16px 16px;flex:1;-webkit-overflow-scrolling:touch}
 .btn.more{width:100%;margin-top:8px;min-height:40px;font-size:14px;color:var(--mode);border-color:var(--mode);background:#fff}
@@ -163,11 +168,11 @@ a{color:#1d4ed8}
 #guideBar .grow .btn[hidden]{display:none}
 .btn.bad{background:#fde2e4;border-color:#f5b5bd;color:#b3123a}
 body.guiding #sheet,body.guiding .seg{display:none}
-body.guiding #fab{bottom:calc(150px + var(--safeB))}
+body.guiding #fab{bottom:calc(var(--gbH,110px) + 18px + var(--safeB))}
 .sgrow{display:flex;gap:8px;margin-top:8px}.sgrow .btn{margin-top:0;flex:1}.sgrow .btn.more{width:auto}
-#gAsk{position:fixed;z-index:10;left:50%;top:50%;transform:translate(-50%,-50%);width:min(88vw,360px);background:#fff;border-radius:16px;box-shadow:0 10px 36px rgba(0,0,0,.3);padding:16px;display:none}
-#gAsk p{margin:0 0 12px;font-size:15px;line-height:1.45}
-#gAsk .btn{width:100%;margin-top:8px}
+#gAsk{position:fixed;z-index:10;left:50%;bottom:calc(12px + var(--safeB));transform:translateX(-50%);width:min(94vw,380px);background:#fff;border-radius:16px;box-shadow:0 -4px 24px rgba(0,0,0,.28);padding:12px 14px;display:none}
+#gAsk p{margin:0 0 8px;font-size:14px;line-height:1.4}
+#gAsk .btn{width:100%;margin-top:6px;min-height:42px;padding:8px}
 #fab button{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:#fff;box-shadow:0 3px 10px rgba(0,0,0,.15);font-size:19px;cursor:pointer}
 
 @media (max-width:899px){
@@ -202,37 +207,34 @@ body.guiding #fab{bottom:calc(150px + var(--safeB))}
 </div>
 
 <div id="fab">
+  <button id="zoomMeBtn" title="내 위치 확대해서 보기" aria-label="내 위치 확대해서 보기">🎯</button>
   <button id="locBtn" title="내 위치에서 출발" aria-label="내 위치에서 출발">📍</button>
   <button id="homeBtn" title="공원 전체 보기" aria-label="공원 전체 보기">🗺️</button>
 </div>
 
 <div id="sheet">
-  <div id="grab" aria-label="안내 펼치기"><i></i></div>
+  <div id="grab" aria-hidden="true"><i></i></div>
   <div id="scroll">
     <div id="summary"></div>
     <div id="locRow"><button class="btn big" id="locBtn2">📍 내 위치로 찾기</button></div>
 
     <div class="sec">
-      <h3><span class="stp">1</span>지금 어디 계세요?</h3>
-      <div class="search2"><input id="q2" type="search" placeholder="장소 이름 검색 (예: 올림픽홀, 소마, 평화)" autocomplete="off" enterkeyhint="search" aria-label="출발 장소 검색"><div id="qres2" role="listbox"></div></div>
-      <select id="fromSel" class="sel" style="margin-top:6px" aria-label="장소 목록에서 출발"><option value="">장소 목록에서 고르기…</option></select>
-      <button class="btn pri" id="locBtn3" style="width:100%;margin-top:8px;min-height:44px">📍 내 위치로 찾기</button>
+      <button class="btn pri" id="locBtn3" style="width:100%;min-height:44px">📍 내 위치로 찾기</button>
+      <select id="fromSel" class="sel" style="margin-top:8px" aria-label="장소 목록에서 출발"><option value="">장소 목록에서 고르기…</option></select>
       <div class="start" style="margin-top:8px"><span class="dot" style="background:#1b1f24"></span><span id="startTxt">아직 고르지 않았어요</span></div>
-      <div class="note" style="margin-top:6px">지도를 한 번 눌러도 그 지점이 출발점이 됩니다.</div>
+      <div class="note" style="margin-top:6px">지도를 눌러서 출발점을 정할 수도 있어요. 출발점을 정하면 가까운 두 곳이 지도에 나와요.</div>
     </div>
 
     <div class="sec">
-      <h3><span class="stp">2</span>무엇을 찾으세요?</h3>
+      <h3><span class="stp">1</span>무엇을 찾으세요?</h3>
       <div class="fac" id="facGrid">
-        <button data-f="wc" class="on">🚻 화장실</button>
-        <button data-f="acc">♿ 장애인 화장실</button>
-        <button data-f="dia">🍼 기저귀 교환대 있는 화장실</button>
-        <button data-f="lm">📍 장소(시설)로 가기</button>
-        <button data-f="dw">🚰 음수대</button>
-        <button data-f="vm">🥤 자판기</button>
-        <button data-f="st">🏪 매점</button>
-        <button data-f="gp">🅿️ 출입문·주차장</button>
+        <button data-g="wc" class="on">🚻 화장실</button>
+        <button data-g="lm">📍 장소(시설)로 가기</button>
+        <button data-g="am">🏪 편의시설</button>
+        <button data-g="gt">🅿️ 출입문·주차장</button>
       </div>
+      <div class="subchips" id="subRow"></div>
+      <div class="search2" id="lmSearch" style="display:none;margin:8px 0 0"><input id="q3" type="search" placeholder="가고 싶은 장소 검색 (예: 소마, 평화, 수영장)" autocomplete="off" enterkeyhint="search" aria-label="도착 장소 검색"><div id="qres3" role="listbox"></div></div>
       <select id="lmSel" class="sel" style="display:none;margin-top:8px" aria-label="도착 장소"></select>
       <details style="margin-top:6px"><summary>자료 안내 더보기</summary>
       <div class="note" id="gpNote" style="display:none;margin-top:6px"><b>출입문·주차장</b>은 올림픽공원 종합안내도에 나온 이름과 위치를 지도에 옮긴 <b>대략 위치</b>입니다(수십 m 오차 가능, 현장 확인 전). 남2문·남4문 주차장은 수치지도 위치입니다. <br><b>대중교통(공단 FAQ, 2024-07-09)</b> 5·9호선 올림픽공원역 3번출구(동2문), 8호선 몽촌토성역 1번출구(평화의 광장), 9호선 한성백제역 2번출구(남4문). 버스 번호는 공원 누리집에서 확인하세요. 주차매표소는 북2문·동2문·남2문·남3문·남4문입니다.</div>
@@ -241,7 +243,7 @@ body.guiding #fab{bottom:calc(150px + var(--safeB))}
     </div>
 
     <div class="sec">
-      <h3><span class="stp">3</span>가까운 곳</h3>
+      <h3><span class="stp">2</span>가까운 곳</h3>
       <div id="cands"></div>
     </div>
 
@@ -254,7 +256,7 @@ body.guiding #fab{bottom:calc(150px + var(--safeB))}
       <h3>지도 보기</h3>
       <div class="row" style="margin-bottom:6px">
         <label class="ck"><input type="checkbox" id="showB" checked>건물</label>
-        <label class="ck"><input type="checkbox" id="showWC" checked>화장실</label>
+        <label class="ck"><input type="checkbox" id="showWC">전체 화장실·시설 보기</label>
         <label class="ck"><input type="checkbox" id="showLM" checked>장소 이름</label>
         <label class="ck"><input type="checkbox" id="showWheel">휠체어 가능 길 보기 <small style="color:var(--sub)">(초록=가능, 빨강=급경사, 검정=계단)</small></label>
       </div>
@@ -962,8 +964,9 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
   }
   function renderCands(){
     const el=$('cands'); if (!el) return;
-    if (!state.start){ el.innerHTML='<div class="note">①에서 위치를 정해 주세요.</div>'; return; }
-    if (state.dest==='lm'){ el.innerHTML='<div class="note">고른 장소까지의 경로가 위 요약에 나옵니다. 화장실을 찾으려면 ②에서 화장실을 고르세요.</div>'; return; }
+    if (!state.start){ el.innerHTML='<div class="note">위에서 출발 위치를 정해 주세요.</div>'; return; }
+    if (state.dest==='none'){ el.innerHTML='<div class="note">찾을 곳을 골라 주세요. 고른 버튼을 다시 누르면 꺼집니다.</div>'; return; }
+    if (state.dest==='lm'){ el.innerHTML='<div class="note">고른 장소까지의 경로가 위 요약에 나옵니다. 화장실을 찾으려면 위에서 화장실을 고르세요.</div>'; return; }
     if (!state.cands.length){ el.innerHTML = state.mode==='old' ? '<div class="note warnTxt"><b>휠체어·유모차로 갈 수 있는 곳을 이 근처에서 찾지 못했어요.</b> 계단을 피하고 20m 구간 경사 8.33% 이하인 길만 안내하는데, 그런 길이 이어지지 않습니다. 다른 시설 종류나 다른 출발점을 골라 보세요.</div>' : '<div class="note warnTxt">이 조건으로 갈 수 있는 곳을 찾지 못했어요. 시설 종류를 바꾸거나 다른 곳에서 출발해 보세요.</div>'; return; }
     const hint = (state.cands.length>1) ? '<div class="note" style="margin:0 0 2px">지도에 가까운 <b>두 곳</b>의 길이 함께 표시됩니다. 고른 곳은 굵은 선, 다른 한 곳은 <b style="color:#8b3fd9">보라색 가는 선</b>입니다. 아래 표에서 더 나은 값은 초록색입니다.</div>' : '';
     let cmp = '';
@@ -999,7 +1002,9 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     const R = state.result, col = state.mode==='kid' ? '#ea6a12' : '#2563eb';
     const modeName = state.mode==='kid' ? '아이·노약자' : '휠체어·유모차';
     if (!state.start){ $('summary').innerHTML=''; $('detail').textContent='-'; $('locRow').style.display='none'; $('locBtn3').style.display=''; applyMore(); return; }
-    $('locRow').style.display=''; $('locBtn3').style.display='none';
+    if (state.dest==='none'){ $('summary').innerHTML='<div class="note" style="padding:6px 2px">찾을 곳을 골라 주세요.</div>'; $('detail').textContent='-'; $('locRow').style.display=''; $('locBtn3').style.display=''; applyMore(); return; }
+    $('locRow').style.display=''; $('locBtn3').style.display='';
+    if (state.dest==='lm' && !state.lm){ $('summary').innerHTML='<div class="note" style="padding:6px 2px">가고 싶은 장소를 검색하거나 목록에서 골라 주세요.</div>'; $('detail').textContent='-'; applyMore(); return; }
     if (!R){
       $('summary').innerHTML = `<div class="dest">갈 수 있는 길을 찾지 못했어요</div><div class="meta">${modeName} 기준으로 이 지점에서 이어지는 길이 없습니다. 다른 곳을 눌러 보세요.</div>`;
       $('detail').textContent='-'; applyMore(); return; }
@@ -1012,8 +1017,8 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     // 경사는 가는 방향에 따라 다르므로 오르막·내리막을 따로 보여 준다(사용자 확인으로 경사 판정에서 뺀 구간 표시는 두지 않는다).
     const slopeBad = state.mode==='old' ? (st.up20>8.34 || st.dn20>12.51) : st.mx20>8.33;
     chips.push(`<span class="chip ${slopeBad?'bad':st.up20>5.56?'warn':''}">경사 오르막 ${degOf(st.up20)}° · 내리막 ${degOf(st.dn20)}°</span>`);
-    chips.push(`<span class="chip">오르막 합계 ${st.gain.toFixed(0)}m</span>`);
-    if (st.estM>1) chips.push(`<span class="chip warn">추정 구간 ${Math.round(st.estM)}m</span>`);
+    const extra=[`<span class="chip">오르막 합계 ${st.gain.toFixed(0)}m</span>`];
+    if (st.estM>1) extra.push(`<span class="chip warn">추정 구간 ${Math.round(st.estM)}m</span>`);
     let warn = '';
     if (state.mode==='old' && R.res.halo) { const wn0 = t => `<div class="note warnTxt" style="margin-top:8px">${t}</div>`; warn += wn0('<b>⚠ 이 길에는 길 면이 이어지지 않아, 넓은 터(광장 등)를 가로지르는 추정 구간이 들어 있습니다.</b> 실제 통행 가능 여부를 꼭 확인하세요.'); }
     const wn = t => `<div class="note warnTxt" style="margin-top:8px">${t}</div>`;
@@ -1022,7 +1027,7 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     if (state.mode==='old' && R.res.unv) warn += wn(`<b>⚠ 몽촌토성 언덕 구간 — 휠체어로 갈 수 있는지 확인되지 않았습니다.</b> 수치지도에는 계단·경사로 정보가 없고 높이 자료가 5m 등고선 기반이라 오차가 큽니다. 로드뷰·현장 확인 전에는 이 길을 권하지 않습니다. 다른 후보를 우선 보세요.`);
     const overTxt = st.up20>8.34 ? `오르막 최대 ${st.up20.toFixed(1)}%(한도 1/12=8.33%)` : `내리막 최대 ${st.dn20.toFixed(1)}%(한도 1/8=12.5%)`;
     const longNote = state.mode==='old' ? `<div class="note warnTxt" style="margin-top:8px">${R.res.over ? `<b>⚠ 이 길은 가는 방향으로 ${overTxt} 구간이 있습니다. 경사 한도 안으로 갈 수 있는 길을 찾지 못해, 계단 면만 피한 가장 가까운 길을 보여 줍니다. 휠체어로 가기 어려울 수 있으니 실제로 확인하세요.</b> ` : ''}계단 면(수치지도)을 6m 이상 피한 길입니다${R.res.over ? '' : '. 20m 구간 경사가 한도(오르막 1/12=8.33%, 내리막 1/8=12.5%)를 넘는 길도 피했습니다'}. 경사는 가는 방향에 따라 오르막·내리막이 달라지므로 방향별로 따로 판정했습니다. <b>경사 각도</b>는 20m 구간의 높이 변화로 잰 값입니다(예: 3.6°는 100m를 가면 약 6.3m 오르는 경사, 6.3%). 휠체어 한도는 오르막 약 4.8°(8.33%), 내리막 약 7.1°(12.5%)이고 접근로 권장은 약 3.2°(5.56%)입니다. 경사로·엘리베이터 자료가 없어 휠체어로 실제 다닐 수 있는지는 확인되지 않았습니다.</div>` : '';
-    $('summary').innerHTML = `<div class="sum"><div class="time">${mm(st.total/REF)===mm(sec) ? mm(sec) : mm(st.total/REF)+'~'+mm(sec)}<small>분</small></div><div><div class="dest">${p.kind==='wc'?'🚻 ':p.kind==='am'?p.icon+' ':''}${p.label}</div><div class="meta">${modeName} · ${Math.round(st.total)}m · 1.0~0.7m/s</div></div></div><div class="chips">${chips.join('')}</div><div class="sgrow"><button class="btn pri" id="guideBtn">▶ 안내 시작</button><button class="btn more" id="moreBtn" aria-expanded="false">자세히 보기 ▾</button></div><div id="moreBox" hidden>${longNote}${warn}</div>`;
+    $('summary').innerHTML = `<div class="sum"><div class="time">${mm(st.total/REF)===mm(sec) ? mm(sec) : mm(st.total/REF)+'~'+mm(sec)}<small>분</small></div><div><div class="dest">${p.kind==='wc'?'🚻 ':p.kind==='am'?p.icon+' ':''}${p.label}</div><div class="meta">${modeName} · ${Math.round(st.total)}m · 1.0~0.7m/s</div></div></div><div class="chips">${chips.join('')}</div><div class="sgrow"><button class="btn pri" id="guideBtn">▶ 안내 시작</button><button class="btn more" id="moreBtn" aria-expanded="false">자세히 보기 ▾</button></div><div id="moreBox" hidden><div class="profBox"><div class="profTtl">가는 길 높낮이</div>${profileSVG(st, col)}</div><div class="chips" style="margin:6px 0">${extra.join('')}</div>${longNote}${warn}</div>`;
     $('moreBtn').onclick = () => { moreOpen = !moreOpen; applyMore(); }; $('guideBtn').onclick = () => guideStart(); applyMore();
     let info = '';
     const rvNote = (state.mode==='old' && st.rvn.length) ? st.rvn.map(q => `${q.cls==='ok'?'🟢':q.cls==='block'?'🔴':'🟠'} ${q.note}`).join('<br>') : '';
@@ -1041,13 +1046,20 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
       <span>경사</span><span>가는 방향 기준 짧은 구간(20m) 오르막 최대 <b>${degPct(st.up20)}</b> · 내리막 최대 <b>${degPct(st.dn20)}</b>${state.mode==='old' ? (st.up20>8.34 ? ' <span class="warnTxt">— 오르막이 한도 1/12(8.33%, 약 4.8°) 초과</span>' : st.dn20>12.51 ? ' <span class="warnTxt">— 내리막이 한도 1/8(12.5%) 초과</span>' : st.up20>5.56 ? ' <span class="warnTxt">— 오르막이 접근로 기준 1/18(5.56%) 초과, 1/12 이내</span>' : '') : ''}<br><small style="color:var(--sub)">${st.win?'100m 구간 평균 최대':'전체 평균'} ${pctDeg(st.mx)} · 계단 구간은 빼고 잼 · 기준: 장애인등편의법 시행규칙 접근로 1/18(5.56%, 약 3.2°), 지형상 곤란 시 1/12(8.33%, 약 4.8°). 반대 방향으로 가면 오르막과 내리막이 바뀝니다(내리막 한도 1/8은 오르막보다 완화한 값).</small></span>
       <span>오르막 합계</span><span>약 ${st.gain.toFixed(1)}m</span>
       ${st.estM>1?`<span>추정 구간</span><span class="warnTxt">약 ${Math.round(st.estM)}m (로드뷰·종합안내도로 확인해 이은 길)</span>`:''}
-      ${info}</div>${profileSVG(st, col)}`;
+      ${info}</div>`;
   }
-  function renderWcOpt(){ const gn=$('gpNote'); if (gn) gn.style.display = (state.dest==='wc' && state.fac==='gp') ? '' : 'none'; document.querySelectorAll('#facGrid button[data-f]').forEach(b => b.classList.toggle('on', state.dest==='lm' ? b.dataset.f==='lm' : b.dataset.f===state.fac)); }
+  const GRP = {wc:['wc','acc','dia'], am:['dw','vm','st'], gt:['gp']};
+  const SUBL = {wc:'🚻 가까운 화장실', acc:'♿ 장애인 화장실', dia:'🍼 기저귀 교환대', dw:'🚰 음수대', vm:'🥤 자판기', st:'🏪 매점'};
+  const grpOf = () => state.dest==='none' ? 'none' : state.dest==='lm' ? 'lm' : (GRP.wc.includes(state.fac) ? 'wc' : GRP.am.includes(state.fac) ? 'am' : 'gt');
+  function renderWcOpt(){ const gn=$('gpNote'); if (gn) gn.style.display = (state.dest==='wc' && state.fac==='gp') ? '' : 'none';
+    const g=grpOf(); document.querySelectorAll('#facGrid button[data-g]').forEach(b => b.classList.toggle('on', b.dataset.g===g));
+    const row=$('subRow'); if (row){ const L = GRP[g] && GRP[g].length>1 ? GRP[g] : [];
+      row.innerHTML = L.map(f => `<button data-f="${f}" class="${state.fac===f?'on':''}">${SUBL[f]}</button>`).join('');
+      row.querySelectorAll('button').forEach(b => b.onclick = () => { state.fac=b.dataset.f; setDest('wc'); compute(false); }); } }
 
   // ---------- compute ----------
   function compute(focus){
-    if (!state.start){ state.result=null; state.cands=[]; render(); drawRoute(); updPins(); return; }
+    if (!state.start || state.dest==='none'){ state.result=null; state.cands=[]; render(); drawRoute(); updPins(); return; }   // 'none' = 찾을 곳을 모두 끈 상태
     const sf = state.mode==='old';
     if (sf) buildSteep();   // 휠체어·유모차: 길을 따라 약 20 m 구간 경사가 1/12(8.33%)를 넘는 칸을 한 번 미리 표시해 둔다
     // 출발점은 누른 자리(가장 가까운 길 위)에서 그대로 시작한다. 휠체어·유모차 모드에서 그 자리가 급경사 칸이어도 다른 길로 옮기지 않고,
@@ -1185,6 +1197,7 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     if (s2 && t0){ const rs=routeK(s2[0], s2[1], [{cell:t0[0]*W+t0[1], p:tp, off:0}], true, false, 1);
       if (rs.length) for (const k of rs[0].path){ EXEMPT[k]=1; const r=(k/W)|0, c=k-r*W;
         for (const [dr,dc] of [[1,0],[-1,0],[0,1],[0,-1]]){ const v=(r+dr)*W+c+dc; if (v>=0 && v<W*H && (flags[v]&(8|128|4)) && !(flags[v]&2)) EXEMPT[v]=1; } } } }
+  let zoomStartFlag = false;   // 내 위치·지도 클릭으로 출발점을 정할 때: 그 자리로 확대
   function setStart(x, y, label, opts={}){
     if (guide.on) return false;
     const r=Math.floor(y/S), c=Math.floor(x/S);
@@ -1194,7 +1207,7 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     const cq = CEN[nw[0]*W+nw[1]]; state.start = {r:nw[0], c:nw[1], x:(nw[1]+(cq?(cq>>4)/15:0.5))*S, y:(nw[0]+(cq?(cq&15)/15:0.5))*S, exclude: opts.exclude || null};
     $('startTxt').textContent = label || '지도에서 고른 지점';
     if (!opts.keepFrom) $('fromSel').value = '';
-    compute(opts.focus !== false);
+    zoomStartFlag = opts.focus !== false; compute(opts.focus !== false); zoomStartFlag = false;
     return true;
   }
   for (const k of OPENBOX){ if ((flags[k]&1) && !(flags[k]&2)) flags[k] |= 8; }   // 위에서 막음을 푼 칸은 길 면으로(휠체어 통행 가능)
@@ -1214,12 +1227,13 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     const showLM=$('showLM').checked, showWC=$('showWC').checked;
     const boxes=[];
     const dTarget = state.result ? state.result.res.t.p : null;
+    const near = new Set(state.dest==='wc' ? state.cands.slice(0,2).map(c => c.res.t.p) : []);   // 기본은 가까운 두 곳만 지도에 표시(전체 보기는 '자세히 보기'에서 켠다)
     const order = places.slice().sort((a,b) => pri(b)-pri(a));
     function pri(p){ if (p===dTarget) return 100; if (state.lm===p.id) return 90; return p.kind==='lm' ? (MAJOR.has(p.name)?30:p.cat==='공연·경기장'?25:20) : 60; }
     const camD = camera.position.distanceTo(controls.target);
     const facOK = p => { if (p.kind!=='wc' || state.dest!=='wc') return true; if (AMF[state.fac]) return false; if (state.fac==='acc') return hasAcc(p.d); if (state.fac==='dia') return hasDia(p.d); return true; };
     for (const p of order){
-      const el=p.el, vis = p===dTarget || state.lm===p.id || (p.kind==='lm' ? (showLM && (camD<=1300 || MAJOR.has(p.name))) : (showWC && facOK(p)));   // 멀리서는 주요 장소 이름만
+      const el=p.el, vis = p===dTarget || state.lm===p.id || (p.kind==='lm' ? (showLM && (camD<=1300 || MAJOR.has(p.name))) : (near.has(p) || (showWC && facOK(p))));   // 멀리서는 주요 장소 이름만
       p.stem.visible = vis;
       if (!vis){ el.classList.add('hide'); continue; }
       const sp = proj(p.x, p.y, Y(zD(p.x,p.y)) + p.stem.scale.y + 2);
@@ -1234,7 +1248,7 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
       { const hw=(el.offsetWidth||60)/2+6; el.style.left=Math.min(Math.max(sp[0],hw),innerWidth-hw)+'px'; el.style.top=sp[1]+'px'; }
     }
     for (const p of amenPlaces){
-      const el=p.el, vis = p===dTarget || state.lm===p.id || (showWC && state.dest==='wc' && state.fac===p.sub);
+      const el=p.el, vis = p===dTarget || state.lm===p.id || near.has(p) || (showWC && state.dest==='wc' && state.fac===p.sub);
       p.stem.visible = vis; el.classList.toggle('sel', p===dTarget);
       if (!vis){ el.classList.add('hide'); continue; }
       const sp = proj(p.x, p.y, Y(zD(p.x,p.y)) + p.stem.scale.y + 2);
@@ -1257,12 +1271,12 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
         d.textContent = rng(c.st.total); d.title = `${c.res.t.p.label} · ${Math.round(c.st.total)}m`;
       }); }
     if (gps.fix && gps.snap){ const sp=proj(gps.snap.x, gps.snap.y, Y(zD(gps.snap.x,gps.snap.y))+3), rp=proj(gps.fix.x, gps.fix.y, Y(zD(gps.fix.x,gps.fix.y))+3), e=proj(gps.fix.x+gps.fix.acc, gps.fix.y, Y(zD(gps.fix.x,gps.fix.y))+3);
-      if (sp && rp && e){ gdot.style.display='block'; gdot.style.left=sp[0]+'px'; gdot.style.top=sp[1]+'px'; const ac=gdot.firstChild, R=Math.max(10, Math.hypot(e[0]-rp[0], e[1]-rp[1])); ac.style.width=ac.style.height=(R*2)+'px'; ac.style.left=(rp[0]-sp[0])+'px'; ac.style.top=(rp[1]-sp[1])+'px';
+      if (sp && rp && e){ gdot.style.display='block'; gdot.style.left=sp[0]+'px'; gdot.style.top=sp[1]+'px'; const ac=gdot.firstChild, R=Math.min(guide.on?36:70, Math.max(10, Math.hypot(e[0]-rp[0], e[1]-rp[1]))); ac.style.width=ac.style.height=(R*2)+'px'; ac.style.left=(rp[0]-sp[0])+'px'; ac.style.top=(rp[1]-sp[1])+'px';
         const cn=gdot.children[1];   // 바라보는 방향(부채꼴): 지도 위 방향을 화면 각도로 바꿔 그린다(지도를 돌려도 맞게)
         if (gps.heading===null) cn.style.display='none'; else { const hr=gps.heading*Math.PI/180, z0=Y(zD(gps.snap.x,gps.snap.y))+3, hp=proj(gps.snap.x+12*Math.sin(hr), gps.snap.y-12*Math.cos(hr), z0);
           if (hp){ cn.style.display='block'; cn.style.transform='rotate('+(Math.atan2(hp[0]-sp[0], -(hp[1]-sp[1]))*180/Math.PI).toFixed(1)+'deg)'; } else cn.style.display='none'; } } else gdot.style.display='none'; } else gdot.style.display='none';
     // start / destination pins
-    if (state.start){ const sp=proj(state.start.x, state.start.y, Y(zD(state.start.x,state.start.y))+6); if (sp){ pinS.style.display='block'; pinS.style.left=sp[0]+'px'; pinS.style.top=sp[1]+'px'; } else pinS.style.display='none'; } else pinS.style.display='none';
+    if (state.start && !guide.on){ const sp=proj(state.start.x, state.start.y, Y(zD(state.start.x,state.start.y))+6); if (sp){ pinS.style.display='block'; pinS.style.left=sp[0]+'px'; pinS.style.top=sp[1]+'px'; } else pinS.style.display='none'; } else pinS.style.display='none';
     if (state.result){ const P=state.result.st.pts, e=P[P.length-1]; const sp=proj(e.x, e.y, Y(zD(e.x,e.y))+6); if (sp && (!dTarget || !dTarget.el || dTarget.el.classList.contains('hide'))){ pinD.style.display='block'; pinD.style.left=sp[0]+'px'; pinD.style.top=sp[1]+'px'; } else pinD.style.display='none'; } else pinD.style.display='none';
   }
 
@@ -1296,30 +1310,33 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
   }
   document.querySelectorAll('.seg button').forEach(b => b.onclick = () => setMode(b.dataset.mode));
   function setDest(d){
-    state.dest=d; renderWcOpt(); $('lmSel').style.display = d==='lm' ? '' : 'none';
+    state.dest=d; renderWcOpt(); $('lmSel').style.display = d==='lm' ? '' : 'none'; $('lmSearch').style.display = d==='lm' ? '' : 'none';
   }
-  document.querySelectorAll('#facGrid button[data-f]').forEach(b => b.onclick = () => {
-    const f=b.dataset.f;
-    if (f==='lm'){ setDest('lm'); if (!state.lm){ $('lmSel').focus(); state.result=null; state.cands=[]; render(); drawRoute(); } else compute(true); }
-    else { state.fac=f; setDest('wc'); compute(false); }
+  document.querySelectorAll('#facGrid button[data-g]').forEach(b => b.onclick = () => {
+    const g=b.dataset.g;
+    if (grpOf()===g){   // 이미 고른 버튼을 다시 누르면 꺼진다(아무것도 고르지 않은 상태)
+      state.lm=null; $('lmSel').value=''; $('q3').value=''; setDest('none'); compute(false); return; }
+    if (g==='lm'){ setDest('lm'); if (!state.lm){ $('q3').focus(); state.result=null; state.cands=[]; render(); drawRoute(); } else compute(true); return; }
+    if (!GRP[g].includes(state.fac) || state.dest==='lm' || state.dest==='none') state.fac = g==='wc' ? (state.mode==='old'?'acc':'wc') : GRP[g][0];
+    setDest('wc'); compute(false);
   });
-  // step 1 search: choose a start place by name
-  (function(){
-    const qi=$('q2'), qr=$('qres2'); const nm=t=>(t||'').toString().replace(/[\s·()（）\-_.,]/g,'').toLowerCase();
-    function show(){ const q=nm(qi.value); if (!q){ qr.style.display='none'; return; }
-      const hits=places.map(p=>{ const a=nm(p.name), l=nm(p.label); const i=Math.min(...[a.indexOf(q), l.indexOf(q)].map(x=>x<0?99:x)); return {p,i}; }).filter(h=>h.i<99).sort((a,b)=>a.i-b.i).slice(0,8);
-      qr.innerHTML = hits.length ? hits.map(h=>`<button data-id="${h.p.id}"><span>${h.p.kind==='wc'?'🚻':CATI[h.p.cat]}</span><span>${h.p.name}</span><span class="tag">${h.p.kind==='wc'?'화장실':h.p.cat}</span></button>`).join('') : '<div style="padding:12px 14px;color:var(--sub);font-size:14px">검색 결과가 없어요.</div>';
-      qr.style.display='block';
-      qr.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const p=byId[b.dataset.id]; qr.style.display='none'; qi.value=p.name; setStart(p.x,p.y,p.name+' 앞',{cell:[p.r,p.c],exclude:p.kind==='wc'?p.id:null}); }); }
-    qi.addEventListener('input',show); qi.addEventListener('focus',show);
-    qi.addEventListener('keydown',e=>{ if (e.key==='Enter'){ const b=qr.querySelector('button'); if (b){ e.preventDefault(); b.click(); } } });
-    document.addEventListener('pointerdown',e=>{ if (!e.target.closest('.search2')) qr.style.display='none'; });
-  })();
   // landmark selects (grouped)
   const groups = {}; places.filter(p=>p.kind==='lm').forEach(p => (groups[p.cat]=groups[p.cat]||[]).push(p));
   const opt = (sel, first) => { sel.innerHTML = `<option value="">${first}</option>`; for (const c of ['공연·경기장','광장·쉼터','전시·역사','다리']){ if (!groups[c]) continue; const g=document.createElement('optgroup'); g.label=CATI[c]+' '+c; groups[c].sort((a,b)=>a.label.localeCompare(b.label,'ko')).forEach(p => { const o=document.createElement('option'); o.value=p.id; o.textContent=p.name; g.appendChild(o); }); sel.appendChild(g); } };
   opt($('lmSel'), '도착할 장소를 고르세요'); opt($('fromSel'), '장소 목록에서 고르기…');
-  $('lmSel').onchange = e => { state.lm = e.target.value || null; compute(true); };
+  $('lmSel').onchange = e => { state.lm = e.target.value || null; const pp=byId[state.lm]; $('q3').value = pp ? pp.name : ''; compute(true); };
+  // 도착 장소 이름 검색
+  (function(){
+    const qi=$('q3'), qr=$('qres3'); const nm=t=>(t||'').toString().replace(/[\s·()（）\-_.,]/g,'').toLowerCase();
+    function show(){ const q=nm(qi.value); if (!q){ qr.style.display='none'; return; }
+      const hits=places.filter(p=>p.kind==='lm').map(p=>{ const a=nm(p.name), l=nm(p.label); const i=Math.min(...[a.indexOf(q), l.indexOf(q)].map(x=>x<0?99:x)); return {p,i}; }).filter(h=>h.i<99).sort((a,b)=>a.i-b.i).slice(0,8);
+      qr.innerHTML = hits.length ? hits.map(h=>`<button data-id="${h.p.id}"><span>${CATI[h.p.cat]||'📍'}</span><span>${h.p.name}</span><span class="tag">${h.p.cat}</span></button>`).join('') : '<div style="padding:12px 14px;color:var(--sub);font-size:14px">검색 결과가 없어요.</div>';
+      qr.style.display='block';
+      qr.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const p=byId[b.dataset.id]; qr.style.display='none'; qi.value=p.name; qi.blur(); state.lm=p.id; $('lmSel').value=p.id; compute(true); }); }
+    qi.addEventListener('input',show); qi.addEventListener('focus',show);
+    qi.addEventListener('keydown',e=>{ if (e.key==='Enter'){ const b=qr.querySelector('button'); if (b){ e.preventDefault(); b.click(); } } });
+    document.addEventListener('pointerdown',e=>{ if (!e.target.closest('#lmSearch')) qr.style.display='none'; });
+  })();
   $('fromSel').onchange = e => { const p=byId[e.target.value]; if (p) setStart(p.x, p.y, p.name+' 앞', {cell:[p.r,p.c], keepFrom:true}); };
   const wheelGroup = new THREE.Group(); scene.add(wheelGroup); wheelGroup.visible = false;
   function buildWheelLayer(){   // 길 중심선 칸을 색 점으로: 초록=휠체어·유모차 가능, 빨강=20 m 구간 경사 8.33% 초과, 검정=계단·막은 곳
@@ -1362,7 +1379,8 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     const r=Math.floor(y/S), c=Math.floor(x/S), nw = nearestWalk(r, c, false, 15);   // 점은 가장 가까운 길 위(30m 안)에 맞춘다
     gps.snap = nw ? {x:(nw[1]+0.5)*S, y:(nw[0]+0.5)*S} : {x, y};
     if (first && guide.pending){ guideCheckStart(); }
-    else if (first){ setStart(x, y, `내 위치 (오차 약 ${Math.round(pos.coords.accuracy)}m)`); toast('내 위치에서 출발합니다. 걸으면 파란 점이 따라 움직여요.', 3500); }
+    else if (first && !gps.zoomWant){ setStart(x, y, `내 위치 (오차 약 ${Math.round(pos.coords.accuracy)}m)`); toast('내 위치에서 출발합니다. 걸으면 파란 점이 따라 움직여요.', 3500); }
+    if (gps.zoomWant){ gps.zoomWant=false; zoomMe(); }   // 🎯를 눌러 위치를 기다리던 경우: 출발 처리 뒤에 내 위치로 확대
   }
   function gpsStart(){
     if (!navigator.geolocation){ toast('이 기기에서는 위치를 쓸 수 없어요. 지도를 눌러 출발점을 고르세요.'); return; }
@@ -1383,6 +1401,7 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     guide.idx=bi; return {rem: Math.max(0, R.st.total-R.st.cum[bi]) + off, off};
   }
   function updateBar(){
+    document.documentElement.style.setProperty('--gbH', ($('guideBar').offsetHeight||110)+'px');   // 안내 바 높이에 맞춰 오른쪽 버튼이 겹치지 않게 올린다
     const ri=remainInfo(); if (!ri) return; const rem=ri.rem, t1=Math.max(1,Math.round(rem/REF/60)), t2=Math.max(1,Math.round(rem/SPEED/60));
     $('gStat').textContent = rem<20 ? '도착했어요' : `${Math.round(rem)}m · ${t1===t2?t1:t1+'~'+t2}분`;
     const p=state.result.res.t.p; $('gDest').textContent = (p.kind==='wc'?'🚻 ':p.kind==='am'?p.icon+' ':'')+p.label;
@@ -1436,6 +1455,13 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     cv.addEventListener('pointermove', e => { if (guide.on && guide.follow && gd && Math.hypot(e.clientX-gd[0], e.clientY-gd[1])>10){ guide.follow=false; $('gRecenter').hidden=false; } });
     cv.addEventListener('pointerup', () => { gd=null; }); cv.addEventListener('pointercancel', () => { gd=null; });
     cv.addEventListener('wheel', () => { if (guide.on && guide.follow){ guide.follow=false; $('gRecenter').hidden=false; } }, {passive:true}); }
+  function zoomMe(){   // 내 위치로 지도를 확대해서 본다(출발점·경로는 바꾸지 않는다)
+    if (guide.on){ guide.follow=true; $('gRecenter').hidden=true; return; }
+    if (gps.id===null || !gps.fix){ gps.zoomWant=true; toast('현재 위치를 찾는 중…', 6000); if (gps.id===null){ gps.fix=null; gpsStart(); } return; }
+    const sn=gps.snap||gps.fix, d=170, z=Y(zD(sn.x,sn.y));
+    controls.target.set(sn.x, z, sn.y); camera.position.set(sn.x+d*0.07, z+d*0.83, sn.y+d*0.55); controls.update();
+  }
+  $('zoomMeBtn').onclick = zoomMe;
   function locate(){
     if (guide.on){ guide.follow=true; $('gRecenter').hidden=true; return; }   // 안내 중에는 '내 위치'로 화면을 되돌린다
     if (gps.id===null){ toast('현재 위치를 찾는 중…', 6000); gps.fix=null; gpsStart(); return; }
@@ -1448,15 +1474,13 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
 
   // bottom sheet (mobile): tap / drag the handle
   const sheet=$('sheet'); let sheetOpen=false;
-  const peekH = () => Math.min(300, Math.round(innerHeight*0.38));   // '내 위치로 찾기'와 요약이 스크롤 없이 한눈에 보이는 높이
-  const openH = () => Math.round(innerHeight*0.74);
+  const peekH = () => Math.min(360, Math.round(innerHeight*0.44));   // '내 위치로 찾기'와 요약이 스크롤 없이 한눈에 보이는 높이
+  const openH = peekH;
   function setSheet(open){ sheetOpen=open; const h = open ? openH() : peekH(); document.documentElement.style.setProperty('--sheetH', h+'px'); fitOffset(); }
   const isDesk = () => innerWidth >= 900;
   let gy=null, gh=0;
-  $('grab').addEventListener('pointerdown', e => { gy=e.clientY; gh=sheet.getBoundingClientRect().height; sheet.style.transition='none'; $('grab').setPointerCapture(e.pointerId); });
-  $('grab').addEventListener('pointermove', e => { if (gy===null) return; const h=Math.max(120, Math.min(openH(), gh + (gy-e.clientY))); document.documentElement.style.setProperty('--sheetH', h+'px'); });
-  $('grab').addEventListener('pointerup', e => { sheet.style.transition=''; if (gy===null) return; const moved=gy-e.clientY; gy=null;
-    if (Math.abs(moved)<6) setSheet(!sheetOpen); else setSheet(moved>0 ? true : (moved<-40 ? false : sheetOpen)); });
+  ['gesturestart','gesturechange'].forEach(t => document.addEventListener(t, e => e.preventDefault()));   // iPhone: 화면 전체 두 손가락 확대 방지
+  // 아래 안내 판은 크기를 바꾸지 않는다(끌거나 눌러도 커지지 않음). 내용은 판 안에서 스크롤한다.
 
 
   // ---------- camera ----------
@@ -1484,6 +1508,8 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
   }
   function focusRoute(){
     if (!state.start) return;
+    if (zoomStartFlag){ const R=state.result, d=Math.min(camera.position.distanceTo(controls.target), Math.min(360, Math.max(200, 150+(R?R.st.total*0.5:0)))), z=Y(zD(state.start.x,state.start.y));
+      controls.target.set(state.start.x, z, state.start.y); camera.position.set(state.start.x+d*0.07, z+d*0.83, state.start.y+d*0.55); controls.update(); return; }
     const pts=[[state.start.x,state.start.y]]; for (const c of (state.dest==='wc' ? state.cands.slice(0,2) : (state.result?[state.result]:[]))){ const P=c.st.pts; for (let i=0;i<P.length;i+=10) pts.push([P[i].x,P[i].y]); const e=P[P.length-1]; pts.push([e.x,e.y]); }
     let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9; for (const [x,y] of pts){ x0=Math.min(x0,x); x1=Math.max(x1,x); y0=Math.min(y0,y); y1=Math.max(y1,y); }
     fitBox(x0-30,y0-30,x1+30,y1+30,1.0);
@@ -1519,7 +1545,7 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     const h=ray.intersectObject(terrain);
     const bh=ray.intersectObjects(bGroup.children, true);
     if (bh.length && (!h.length || bh[0].distance <= h[0].distance + 0.5)){ let o=bh[0].object; while (o && !(o.userData && o.userData.b)) o=o.parent; if (o && pickBuilding(o)) return; }
-    if (h.length) setStart(h[0].point.x, h[0].point.z, null, {focus:false});
+    if (h.length) setStart(h[0].point.x, h[0].point.z, null);
   });
 
   addEventListener('resize', () => { if (!isDesk()) setSheet(sheetOpen); else fitOffset(); });
