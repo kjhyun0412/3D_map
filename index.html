@@ -21,7 +21,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#dfe9f0;color:var(--in
 button,select{font:inherit;color:inherit}
 
 /* top bar */
-#top{position:fixed;left:0;right:0;top:0;padding:calc(10px + var(--safeT)) 12px 0;z-index:6;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:8px}
+#top{position:fixed;left:0;right:0;top:0;padding:calc(10px + var(--safeT)) 12px 0;z-index:6;pointer-events:none;display:flex;flex-direction:row;justify-content:center;align-items:center;gap:8px}
 #top .title{pointer-events:auto;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:800;font-size:15px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
 .search{pointer-events:auto;position:relative;width:min(92vw,420px)}
 .search input{width:100%;border:1px solid var(--line);background:rgba(255,255,255,.97);border-radius:14px;padding:11px 14px;font-size:15px;min-height:46px;box-shadow:0 4px 16px rgba(0,0,0,.12);outline:none}
@@ -37,13 +37,56 @@ button,select{font:inherit;color:inherit}
 .search2{position:relative;margin-bottom:8px}
 .search2 input{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-size:15px;min-height:46px;outline:none;background:#fff}
 .search2 input:focus{border-color:var(--mode)}
-#qres2,#qres3{display:none;position:absolute;left:0;right:0;top:50px;z-index:3;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.2);max-height:38vh;overflow:auto}
-#qres2 button,#qres3 button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:0;background:#fff;padding:11px 14px;min-height:46px;font-size:14.5px;cursor:pointer;border-bottom:1px solid #f0eee8}
-#qres2 .tag,#qres3 .tag{margin-left:auto;font-size:12px;color:var(--sub);white-space:nowrap}
+#qres2,#qres3,#qres4{display:none;position:absolute;left:0;right:0;top:50px;z-index:3;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.2);max-height:38vh;overflow:auto}
+#qres2 button,#qres3 button,#qres4 button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:0;background:#fff;padding:11px 14px;min-height:46px;font-size:14.5px;cursor:pointer;border-bottom:1px solid #f0eee8}
+#qres2 .tag,#qres3 .tag,#qres4 .tag{margin-left:auto;font-size:12px;color:var(--sub);white-space:nowrap}
 .fac{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .fac button{min-height:54px;border:1px solid var(--line);border-radius:12px;background:#fff;font-size:14.5px;font-weight:700;padding:8px 10px;cursor:pointer;line-height:1.25}
 .fac button.on{background:var(--mode);border-color:var(--mode);color:#fff}
 .profBox{margin:10px 0 4px}.profTtl{font-size:13px;font-weight:800;margin-bottom:2px}
+.fac{grid-template-columns:repeat(4,1fr);gap:6px}
+.fac button{min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12.5px;padding:6px 2px}
+.fac .fi{font-size:22px;line-height:1}
+#startSec{border-top:0;margin-top:0;padding-top:2px}
+.startLine{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:700}
+.linkbtn{margin-left:auto;border:0;background:none;color:var(--mode);font-weight:700;font-size:14px;cursor:pointer;min-height:36px;padding:0 4px}
+#startEdit{display:flex;gap:8px;margin-top:6px}
+#startEdit .btn{width:auto;flex:none;min-height:44px;padding:0 12px;margin:0;white-space:nowrap}
+#startEdit .sel{flex:1;min-width:0;margin:0}
+#startHint{margin-top:6px}
+#facSec{margin-top:10px;padding-top:10px}
+#summary{margin-top:8px}
+#menuBtn{position:absolute;left:12px;top:calc(8px + var(--safeT));pointer-events:auto;width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.96);box-shadow:0 2px 10px rgba(0,0,0,.12);font-size:20px;cursor:pointer}
+#menuPage{position:fixed;inset:0;z-index:30;background:var(--bg);overflow:auto;-webkit-overflow-scrolling:touch}
+#menuPage[hidden]{display:none}
+.mhead{position:sticky;top:0;z-index:2;background:var(--bg);display:flex;align-items:center;justify-content:space-between;padding:calc(10px + var(--safeT)) 16px 10px;border-bottom:1px solid var(--line);font-size:17px}
+.msec{border-bottom:1px solid var(--line)}
+div.msec{padding-bottom:12px}
+.mh{margin:14px 0 6px;font-size:15px;font-weight:800}
+.fsrow{display:flex;gap:8px}.fsrow .btn{flex:1;min-height:46px}
+.fsrow .btn.on{background:var(--mode);border-color:var(--mode);color:#fff}
+body.fs1 #scroll,body.fs1 .mbody{zoom:1.15}
+body.fs2 #scroll,body.fs2 .mbody{zoom:1.3}
+.msec>summary{font-size:15px;font-weight:800;color:var(--text);min-height:50px}
+.msec[open]>summary{color:var(--mode)}
+.msec .row{margin:2px 0 10px}
+#menuPage .sec{border-top:0;margin-top:0;padding-top:0}
+.mquick{display:flex;gap:8px;margin:12px 0 6px}
+.mquick .btn{flex:1;min-height:64px;padding:8px 4px;font-size:13px;line-height:1.35}
+ol.how{padding-left:20px;margin:2px 0 12px;font-size:14px;line-height:1.55}
+#qres4{max-height:55vh}
+.mbody{padding:0 16px calc(28px + var(--safeB));max-width:640px;margin:0 auto}
+#sheet{overflow:hidden}
+#sheet.al-b #scroll{display:flex;flex-direction:column;justify-content:flex-end}
+#sheet.sliding #scroll{overflow:hidden}
+@keyframes nudge{0%,100%{transform:translateY(0)}30%{transform:translateY(-16px)}60%{transform:translateY(-5px)}}
+#sheet.nudge{animation:nudge .9s ease .3s 2}
+@media (max-width:899px){ body.sp0 #grab{height:46px;flex-direction:column;gap:4px;justify-content:center}
+  body.sp0 #grab::after{content:"▲ 위로 올려 보기";font-size:11.5px;color:var(--sub);font-weight:700}
+  body:not(.more) #candSec{display:none}
+  body.sp0 #startSec, body.sp0 #facSec{display:none}
+  body.sp0 #summary{margin-top:0}
+  body.sp2 #sheet{max-height:86vh} }
 .subchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.subchips:empty{display:none}
 .subchips button{min-height:38px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:13.5px;font-weight:700;padding:6px 12px;cursor:pointer}
 .subchips button.on{background:var(--mode);border-color:var(--mode);color:#fff}
@@ -74,9 +117,9 @@ body.bigtext #sheet{zoom:1.22}
 /* bottom sheet (mobile) / side panel (desktop) */
 html,body{touch-action:pan-x pan-y}   /* 화면 전체가 두 손가락으로 커지지 않게(지도 확대·축소는 지도 안에서만) */
 #sheet{touch-action:pan-y;position:fixed;left:0;right:0;bottom:0;z-index:7;background:var(--bg);border-radius:18px 18px 0 0;box-shadow:0 -6px 24px rgba(0,0,0,.16);
-  max-height:78vh;height:var(--sheetH,200px);transition:height .25s ease;display:flex;flex-direction:column;padding-bottom:var(--safeB)}
-#grab{flex:none;height:18px;display:flex;align-items:center;justify-content:center;pointer-events:none}
-#grab i{width:44px;height:5px;border-radius:3px;background:#cfccc4}
+  max-height:74vh;height:auto;display:flex;flex-direction:column;padding-bottom:var(--safeB)}
+#grab{flex:none;height:30px;display:flex;align-items:center;justify-content:center;touch-action:none;cursor:grab}
+#grab i{width:56px;height:6px;border-radius:3px;background:#b9b5ab}
 #locRow{display:none!important}   /* 요약(소요시간·가는 곳·상태·자세히 보기) 바로 아래 */
 #locRow .btn.big{margin-bottom:0;min-height:48px}
 #scroll{overflow:auto;padding:0 16px 16px;flex:1;-webkit-overflow-scrolling:touch}
@@ -124,8 +167,8 @@ a{color:#1d4ed8}
 .lb .t{overflow:hidden;text-overflow:ellipsis;max-width:min(260px,52vw)}
 .gdot{position:fixed;left:0;top:0;z-index:7;pointer-events:none;display:none}
 .gdot .acc{position:absolute;border-radius:50%;background:rgba(37,99,235,.14);border:1px solid rgba(37,99,235,.35);transform:translate(-50%,-50%)}
-.gdot .cone{position:absolute;left:0;top:0;width:104px;height:104px;margin:-52px 0 0 -52px;display:none;pointer-events:none;background:conic-gradient(from -34deg,rgba(37,99,235,.7) 0deg,rgba(37,99,235,0) 68deg,rgba(37,99,235,0) 360deg);-webkit-mask:radial-gradient(circle,transparent 0 9px,#000 12px,rgba(0,0,0,.2) 100%);mask:radial-gradient(circle,transparent 0 9px,#000 12px,rgba(0,0,0,.2) 100%);border-radius:50%}
-.gdot .dot{position:absolute;width:16px;height:16px;border-radius:50%;background:#2563eb;border:3px solid #fff;box-shadow:0 0 0 2px rgba(37,99,235,.35),0 2px 6px rgba(0,0,0,.4);transform:translate(-50%,-50%)}
+.gdot .cone{position:absolute;left:0;top:0;width:156px;height:156px;margin:-78px 0 0 -78px;display:none;pointer-events:none;background:conic-gradient(from -34deg,rgba(37,99,235,.7) 0deg,rgba(37,99,235,0) 68deg,rgba(37,99,235,0) 360deg);-webkit-mask:radial-gradient(circle,transparent 0 14px,#000 18px,rgba(0,0,0,.2) 100%);mask:radial-gradient(circle,transparent 0 14px,#000 18px,rgba(0,0,0,.2) 100%);border-radius:50%}
+.gdot .dot{position:absolute;width:24px;height:24px;border-radius:50%;background:#2563eb;border:4px solid #fff;box-shadow:0 0 0 3px rgba(37,99,235,.35),0 2px 8px rgba(0,0,0,.45);transform:translate(-50%,-50%)}
 .lb{position:fixed;left:0;top:0;transform:translate(-50%,-100%);z-index:3;display:flex;align-items:center;gap:5px;white-space:nowrap;
   background:#fff;border-radius:999px;padding:4px 9px 4px 5px;font-size:12.5px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.18);
   border:1.5px solid var(--lc,#999);cursor:pointer;user-select:none;will-change:transform;width:max-content}
@@ -155,7 +198,9 @@ a{color:#1d4ed8}
   box-shadow:0 8px 28px rgba(0,0,0,.25);padding:14px;display:none}
 #pop h4{margin:0 0 4px;font-size:16px}
 #pop .row{margin-top:10px}
-#pop .row .btn{flex:1}
+#pop .row{flex-wrap:nowrap}
+#pop .row .btn{flex:1;white-space:nowrap;padding:10px 6px}
+#pop .row .btn#popX{flex:none;width:44px;padding:0}
 #toast{position:fixed;z-index:9;left:50%;top:calc(120px + var(--safeT));transform:translateX(-50%);background:rgba(27,31,36,.92);color:#fff;padding:9px 14px;border-radius:12px;font-size:14px;display:none;max-width:90vw;text-align:center}
 #fab{position:fixed;z-index:6;right:12px;bottom:calc(var(--sheetH,200px) + 12px);display:flex;flex-direction:column;gap:8px}
 #guideBar{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--bg);border-radius:18px 18px 0 0;box-shadow:0 -6px 24px rgba(0,0,0,.18);padding:12px 14px calc(12px + var(--safeB))}
@@ -181,6 +226,7 @@ body.guiding #fab{bottom:calc(var(--gbH,110px) + 18px + var(--safeB))}
   .seg button .ic{font-size:14px}
   #top .title{padding:4px 12px;font-size:14px}
 }
+@media (max-width:380px){ .seg button{padding:5px 7px;font-size:12px;gap:3px} .seg button .ic{font-size:12px} }
 @media (min-width:900px){
   #guideBar{left:50%;right:auto;transform:translateX(-50%);width:440px;bottom:20px;border-radius:16px}
   body.guiding #fab{bottom:130px}
@@ -199,7 +245,7 @@ body.guiding #fab{bottom:calc(var(--gbH,110px) + 18px + var(--safeB))}
 <div id="map"></div>
 
 <div id="top">
-  <div class="title">올림픽공원 3D 보행지도</div>
+  <button id="menuBtn" aria-label="메뉴 열기">☰</button>
   <div class="seg" role="tablist" aria-label="걸음 기준">
     <button data-mode="kid" class="on" role="tab"><span class="ic">👶</span>아이·노약자</button>
     <button data-mode="old" role="tab"><span class="ic">♿</span>휠체어·유모차</button>
@@ -215,35 +261,33 @@ body.guiding #fab{bottom:calc(var(--gbH,110px) + 18px + var(--safeB))}
 <div id="sheet">
   <div id="grab" aria-hidden="true"><i></i></div>
   <div id="scroll">
+    <div class="sec" id="startSec">
+      <div class="startLine"><span class="dot" style="background:#1b1f24"></span><span id="startTxt">아직 고르지 않았어요</span><button class="linkbtn" id="startEditBtn" style="display:none">✎ 바꾸기</button></div>
+      <div id="startEdit">
+        <button class="btn pri" id="locBtn3">📍 내 위치로</button>
+        <select id="fromSel" class="sel" aria-label="장소 목록에서 출발"><option value="">장소 목록에서 고르기…</option></select>
+      </div>
+      <div class="note" id="startHint">내 위치를 찾거나 장소를 고르거나, 지도를 눌러 출발점을 정해 주세요.</div>
+    </div>
+
+    <div class="sec" id="facSec">
+      <div class="fac" id="facGrid">
+        <button data-g="wc" class="on"><span class="fi">🚻</span><span class="fl">화장실</span></button>
+        <button data-g="lm"><span class="fi">📍</span><span class="fl">장소(시설)</span></button>
+        <button data-g="am"><span class="fi">🏪</span><span class="fl">편의시설</span></button>
+        <button data-g="gt"><span class="fi">🅿️</span><span class="fl">출입·주차</span></button>
+      </div>
+      <div class="subchips" id="subRow"></div>
+      <div class="note" id="gpHint" style="display:none;margin-top:6px;white-space:nowrap">출입문·주차장은 <b>대략 위치</b>예요 (수십 m 오차 가능)</div>
+      <div class="search2" id="lmSearch" style="display:none;margin:8px 0 0"><input id="q3" type="search" placeholder="가고 싶은 장소 검색 (예: 소마, 평화, 수영장)" autocomplete="off" enterkeyhint="search" aria-label="도착 장소 검색"><div id="qres3" role="listbox"></div></div>
+      <select id="lmSel" class="sel" style="display:none;margin-top:8px" aria-label="도착 장소"></select>
+    </div>
+
     <div id="summary"></div>
     <div id="locRow"><button class="btn big" id="locBtn2">📍 내 위치로 찾기</button></div>
 
-    <div class="sec">
-      <button class="btn pri" id="locBtn3" style="width:100%;min-height:44px">📍 내 위치로 찾기</button>
-      <select id="fromSel" class="sel" style="margin-top:8px" aria-label="장소 목록에서 출발"><option value="">장소 목록에서 고르기…</option></select>
-      <div class="start" style="margin-top:8px"><span class="dot" style="background:#1b1f24"></span><span id="startTxt">아직 고르지 않았어요</span></div>
-      <div class="note" style="margin-top:6px">지도를 눌러서 출발점을 정할 수도 있어요. 출발점을 정하면 가까운 두 곳이 지도에 나와요.</div>
-    </div>
-
-    <div class="sec">
-      <h3><span class="stp">1</span>무엇을 찾으세요?</h3>
-      <div class="fac" id="facGrid">
-        <button data-g="wc" class="on">🚻 화장실</button>
-        <button data-g="lm">📍 장소(시설)로 가기</button>
-        <button data-g="am">🏪 편의시설</button>
-        <button data-g="gt">🅿️ 출입문·주차장</button>
-      </div>
-      <div class="subchips" id="subRow"></div>
-      <div class="search2" id="lmSearch" style="display:none;margin:8px 0 0"><input id="q3" type="search" placeholder="가고 싶은 장소 검색 (예: 소마, 평화, 수영장)" autocomplete="off" enterkeyhint="search" aria-label="도착 장소 검색"><div id="qres3" role="listbox"></div></div>
-      <select id="lmSel" class="sel" style="display:none;margin-top:8px" aria-label="도착 장소"></select>
-      <details style="margin-top:6px"><summary>자료 안내 더보기</summary>
-      <div class="note" id="gpNote" style="display:none;margin-top:6px"><b>출입문·주차장</b>은 올림픽공원 종합안내도에 나온 이름과 위치를 지도에 옮긴 <b>대략 위치</b>입니다(수십 m 오차 가능, 현장 확인 전). 남2문·남4문 주차장은 수치지도 위치입니다. <br><b>대중교통(공단 FAQ, 2024-07-09)</b> 5·9호선 올림픽공원역 3번출구(동2문), 8호선 몽촌토성역 1번출구(평화의 광장), 9호선 한성백제역 2번출구(남4문). 버스 번호는 공원 누리집에서 확인하세요. 주차매표소는 북2문·동2문·남2문·남3문·남4문입니다.</div>
-      <div class="note" style="margin-top:6px">음수대·자판기·매점 위치는 올림픽공원 편의시설 정보(공공데이터포털 15089799, 2021-09-24 기준) 좌표입니다. 지금도 있는지, 영업 중인지는 확인하지 못했습니다. 매점은 간이편의점·식음료판매점입니다.</div>
-      </details>
-    </div>
-
-    <div class="sec">
-      <h3><span class="stp">2</span>가까운 곳</h3>
+    <div class="sec" id="candSec">
+      <h3>가까운 곳 비교</h3>
       <div id="cands"></div>
     </div>
 
@@ -251,37 +295,45 @@ body.guiding #fab{bottom:calc(var(--gbH,110px) + 18px + var(--safeB))}
       <h3>경로 자세히</h3>
       <div id="detail" class="note">-</div>
     </div>
+  </div>
+</div>
 
-    <div class="sec">
-      <h3>지도 보기</h3>
+<div id="menuPage" hidden>
+  <div class="mhead"><b>올림픽공원 3D 보행지도</b><button class="linkbtn" id="menuClose">✕ 닫기</button></div>
+  <div class="mbody">
+    <div class="search2" id="mSearch" style="margin:12px 0 0"><input id="q4" type="search" placeholder="🔍 장소·화장실 검색 (예: 소마)" autocomplete="off" enterkeyhint="search" aria-label="장소 검색"><div id="qres4" role="listbox"></div></div>
+    <div class="mquick">
+      <button class="btn" id="mLoc">📍<br>내 위치 출발</button>
+      <button class="btn" id="mZoom">🎯<br>내 위치 확대</button>
+      <button class="btn" id="mHome">🗺️<br>전체 보기</button>
+    </div>
+    <div class="msec"><h4 class="mh">지도 보기</h4>
       <div class="row" style="margin-bottom:6px">
         <label class="ck"><input type="checkbox" id="showB" checked>건물</label>
         <label class="ck"><input type="checkbox" id="showWC">전체 화장실·시설 보기</label>
         <label class="ck"><input type="checkbox" id="showLM" checked>장소 이름</label>
         <label class="ck"><input type="checkbox" id="showWheel">휠체어 가능 길 보기 <small style="color:var(--sub)">(초록=가능, 빨강=급경사, 검정=계단)</small></label>
       </div>
-      <div id="legendBox" hidden><h4 style="margin:6px 0">색 안내 (참고)</h4>
-      <div class="legend">
-        <div class="sw" style="background:#f7eccd;border:1px solid #d9cfb0"></div><div>걸을 수 있는 길·광장</div>
-        <div class="sw" style="background:#e86e54"></div><div>계단·스탠드</div>
-        <div class="sw" style="background:#b3123a"></div><div>계단 근처 — 로드뷰 확인 결과 휠체어 진입 어려움(이 길은 경로에서 제외)</div>
-        <div class="sw" style="background:#12a594"></div><div>휠체어·유모차 경로 중 계단 근처(12m 안) — 로드뷰로 우회 가능 확인</div>
-        <div class="sw" style="background:#e8590c"></div><div>계단 근처 — 우회는 되나 조건 있음(경사·지정된 길)</div>
-        <div class="sw" style="background:#f5a300"></div><div>계단 근처 — 로드뷰로 확인하지 못함(확인 필요)</div>
-        <div class="sw" style="background:#a8d384"></div><div>잔디·숲 (높을수록 진한 초록)</div>
-        <div class="sw" style="background:#5ca5de"></div><div>호수·하천</div>
-        <div class="sw" style="background:var(--c-perf)"></div><div>공연·경기장</div>
-        <div class="sw" style="background:var(--c-plaza)"></div><div>광장·쉼터</div>
-        <div class="sw" style="background:var(--c-hist)"></div><div>전시·역사</div>
-        <div class="sw" style="background:var(--c-bridge)"></div><div>다리</div>
-        <div class="sw" style="background:var(--c-wc)"></div><div>화장실 (♿ 표시 = 장애인화장실 있음)</div>
-        <div style="grid-column:1/3;margin-top:4px" class="note">건물 색은 실제 외벽 색이 아니라 재질 느낌의 그림입니다: 경기장·공연장 밝은 콘크리트, 고층 건물 유리, 전시관 석재, 정자 목재. 지붕은 더 어두운 회색입니다.</div>
-      </div>
-      </div>
     </div>
+    <div class="msec"><h4 class="mh">글씨 크기</h4>
+      <div class="fsrow"><button class="btn" data-fs="0">보통</button><button class="btn" data-fs="1">크게</button><button class="btn" data-fs="2">아주 크게</button></div>
+    </div>
+    <details class="msec"><summary>사용법</summary>
+      <ol class="how">
+        <li>위쪽에서 <b>걸음 기준</b>을 고릅니다 (아이·노약자 / 휠체어·유모차).</li>
+        <li><b>출발점</b>을 정합니다: [📍 내 위치로], 장소 목록, 또는 지도를 눌러요.</li>
+        <li><b>찾을 곳</b>을 고르면 가까운 두 곳이 지도에 나와요 (화장실·장소·편의시설·출입·주차).</li>
+        <li>[▶ 안내 시작]을 누르면 내 위치를 따라 안내해요.</li>
+        <li>아래 카드는 손잡이를 위아래로 끌어 크기를 바꿀 수 있어요.</li>
+      </ol>
+    </details>
+    <details class="msec"><summary>자료 안내</summary>
+      <div class="note" id="gpNote" style="margin-top:6px"><b>출입문·주차장</b>은 올림픽공원 종합안내도에 나온 이름과 위치를 지도에 옮긴 <b>대략 위치</b>입니다(수십 m 오차 가능, 현장 확인 전). 남2문·남4문 주차장은 수치지도 위치입니다. <br><b>대중교통(공단 FAQ, 2024-07-09)</b> 5·9호선 올림픽공원역 3번출구(동2문), 8호선 몽촌토성역 1번출구(평화의 광장), 9호선 한성백제역 2번출구(남4문). 버스 번호는 공원 누리집에서 확인하세요. 주차매표소는 북2문·동2문·남2문·남3문·남4문입니다.</div>
+      <div class="note" style="margin-top:6px">음수대·자판기·매점 위치는 올림픽공원 편의시설 정보(공공데이터포털 15089799, 2021-09-24 기준) 좌표입니다. 지금도 있는지, 영업 중인지는 확인하지 못했습니다. 매점은 간이편의점·식음료판매점입니다.</div>
+    </details>
 
     <div class="sec">
-      <details><summary>기준과 한계</summary>
+      <details class="msec"><summary>기준과 한계</summary>
         <ul>
           <li>걸리는 시간은 <b>1.0m/s(빠른 쪽)~0.7m/s(느린 쪽)</b> 범위로 보여 줍니다. 0.7m/s는 경찰청 보행약자 기준(<a href="https://www.police.go.kr/user/bbs/BD_selectBbs.do?q_bbsCode=1001&q_bbscttSn=20201201084730717" target="_blank" rel="noopener">경찰청 공지</a>), 1.0m/s는 일반 보행 기준입니다. 신호 횡단 기준이라 공원 산책 속도와 다를 수 있습니다.</li><li>경사는 계단이 아닌 길에서 20m 구간 중 가장 가파른 값을 %와 각도(°)로 보여 줍니다. 노약자·장애인 기준은 휠체어 접근로 한도 1/12(8.33%, 약 4.8°)를 넘는 길을 피합니다(장애인등편의법 시행규칙). 아이 걸음은 계단·비탈을 그대로 안내하고, 가파른 곳은 표시만 합니다.</li>
           <li><b>아이·노약자</b>는 계단·경사 제한 없이 가장 가까운 길입니다. <b>휠체어·유모차</b>는 수치지도의 계단·스탠드 면에서 6m 이상 떨어진 길입니다. 계단 윤곽이 실제 계단보다 작게 그려졌을 수 있어 계단 근처를 지나는 구간은 색으로 구분해 표시합니다. 로드뷰로 휠체어가 못 오른다고 확인된 두 곳(만남의광장 주차장 쪽 계단길 등)은 노약자·장애인 경로에서 아예 제외했습니다(초록=로드뷰로 우회 확인, 주황=조건부, 빨강=휠체어 진입 어려움, 노랑=확인 못함). 가장 많이 지나는 20곳은 모두 로드뷰로 확인했습니다(2026-11-18, 사용자 확인). 그 밖의 계단 근처 구간은 노랑(확인하지 못함)입니다. 경사로·엘리베이터 자료가 없어 휠체어로 실제 갈 수 있는지는 확인하지 못했습니다.</li>
@@ -293,7 +345,7 @@ body.guiding #fab{bottom:calc(var(--gbH,110px) + 18px + var(--safeB))}
           <li>지형은 화면용으로 부드럽게 다듬었습니다(거리·경사 계산은 원래 고도 사용).</li>
         </ul>
       </details>
-      <details><summary>자료 출처</summary>
+      <details class="msec"><summary>자료 출처</summary>
         <ul>
           <li>지형·길·계단·건물·호수: 국토지리정보원 수치지형도 Ver2.0 도엽 37705085·086·095·096 (2025)</li>
           <li>화장실 위치·장애인화장실·기저귀교환대: <a href="https://www.data.go.kr/data/15146086/fileData.do" target="_blank" rel="noopener">서울특별시_공중화장실 위치정보</a> (15146086)</li>
@@ -449,10 +501,15 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
 
   // ---------- scene ----------
   const isTouch = matchMedia('(pointer:coarse)').matches;
-  const renderer = new THREE.WebGLRenderer({antialias:true, powerPreference:'high-performance'});
-  renderer.setPixelRatio(Math.min(devicePixelRatio, isTouch ? 1.75 : 2));
+  const renderer = new THREE.WebGLRenderer({antialias: !(isTouch && devicePixelRatio>=2.5), powerPreference:'high-performance'});   // 고해상도 폰에서는 그래픽 메모리를 아끼려고 계단 현상 보정을 끄고 해상도를 낮춘다(지도가 가끔 까맣게 되는 문제 예방)
+  renderer.setPixelRatio(Math.min(devicePixelRatio, isTouch ? 1.5 : 2));
   renderer.setClearColor(0xdfe9f0);
   $('map').appendChild(renderer.domElement);
+  { const cv=renderer.domElement; let lostT=null;   // 그래픽이 끊기면(메모리 부족·화면 전환 등) 되살리고, 안 되면 한 번 새로 불러온다
+    cv.addEventListener('webglcontextlost', e => { e.preventDefault(); toast('지도를 다시 불러오는 중…', 4000);
+      lostT=setTimeout(() => { try { if (sessionStorage.getItem('ctxReload')) return; sessionStorage.setItem('ctxReload','1'); } catch (_) {} location.reload(); }, 4000); });
+    cv.addEventListener('webglcontextrestored', () => { clearTimeout(lostT); renderer.setClearColor(0xdfe9f0);
+      scene.traverse(o => { if (o.material) [].concat(o.material).forEach(m => { m.needsUpdate=true; for (const k in m){ const v=m[k]; if (v && v.isTexture) v.needsUpdate=true; } }); }); toast('지도를 다시 불러왔어요.', 2000); }); }
   const scene = new THREE.Scene();
   scene.fog = new THREE.Fog(0xdfe9f0, 3600, 9000);
   const camera = new THREE.PerspectiveCamera(42, 1, 5, 20000);
@@ -588,7 +645,7 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     document.body.appendChild(el); p.el = el;
   }
   const pinS = document.createElement('div'); pinS.className='pin s'; pinS.textContent='출발'; pinS.style.display='none'; document.body.appendChild(pinS);
-  const rtag = [0,1].map(k => { const d=document.createElement('div'); d.className='rtag'; d.style.display='none'; d.onclick=()=>{ const i=+d.dataset.i; if (!isNaN(i) && state.cands[i]){ state.selIdx=i; state.result=state.cands[i]; render(); drawRoute(); updPins(); } }; document.body.appendChild(d); return d; });
+  const rtag = [0,1].map(k => { const d=document.createElement('div'); d.className='rtag'; d.style.display='none'; d.onclick=()=>{ const i=+d.dataset.i; if (!isNaN(i) && state.cands[i]){ state.selIdx=i; state.result=state.cands[i]; render(); drawRoute(); updPins(); foldIfResult(); } }; document.body.appendChild(d); return d; });
   const pinD = document.createElement('div'); pinD.className='pin d'; pinD.textContent='도착'; pinD.style.display='none'; document.body.appendChild(pinD);
 
   function placeAll(){
@@ -992,13 +1049,42 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
       if (state.mode==='old' && c.res.over) tags += st.up20>8.34 ? ` · ⚠ 오르막 한도(4.8°) 초과 ${degOf(st.up20)}° — 휠체어로 오르기 어려울 수 있음` : ` · ⚠ 내리막 한도(7.1°) 초과 ${degOf(st.dn20)}°`;
       const other = i<2 && i!==state.selIdx && state.cands.length>1;
       return `<button class="cand ${i===state.selIdx?'on':''}" data-i="${i}"><span class="rk"${other?' style="background:#8b3fd9;color:#fff"':''}>${i+1}</span><span class="cm"><b>${p.label}</b><small>${tags}</small></span><span class="ct">${rng(st.total)}<small>${Math.round(st.total)}m</small></span></button>`; }).join('');
-    el.querySelectorAll('.cand').forEach(b => b.onclick = () => { state.selIdx=+b.dataset.i; state.result=state.cands[state.selIdx]; render(); drawRoute(); updPins(); focusRoute(); });
+    el.querySelectorAll('.cand').forEach(b => b.onclick = () => { state.selIdx=+b.dataset.i; state.result=state.cands[state.selIdx]; render(); drawRoute(); updPins(); focusRoute(); foldIfResult(); });
   }
   function render(){ renderMain(); renderCands(); }
   // 안내 상세(경고·설명·경로 자세히)는 '자세히 보기' 버튼을 눌러야 펼쳐진다.
   let moreOpen = false;
-  function applyMore(){ const b=$('moreBox'), ds=$('detailSec'), bt=$('moreBtn'); if (b) b.hidden=!moreOpen; const lg=$('legendBox'); if (lg) lg.hidden=!moreOpen; if (ds) ds.style.display = (bt && moreOpen) ? 'block' : 'none'; if (bt){ bt.textContent = moreOpen ? '자세히 닫기 ▴' : '자세히 보기 ▾'; bt.setAttribute('aria-expanded', moreOpen); } }
+  function applyMore(){ const b=$('moreBox'), ds=$('detailSec'), bt=$('moreBtn'); if (b) b.hidden=!moreOpen; const lg=$('legendBox'); document.body.classList.toggle('more', moreOpen); if (ds) ds.style.display = (bt && moreOpen) ? 'block' : 'none'; if (bt){ bt.textContent = moreOpen ? '자세히 닫기 ▴' : '자세히 보기 ▾'; bt.setAttribute('aria-expanded', moreOpen); } }
+  let startEditing=false, sheetSt=1;   // 아래 카드 단계: 0=접힘(결과 한 줄), 1=중간, 2=펼침
+  // ---- 아래 카드: 단계 사이를 부드럽게 미끄러지듯 오간다 ----
+  function applyContent(n){ document.body.classList.remove('sp0','sp1','sp2'); document.body.classList.add('sp'+n); moreOpen=(n===2); applyMore(); }
+  function natH(n){ applyContent(n); sheet.style.transition='none'; sheet.style.height='auto'; return Math.round(sheet.getBoundingClientRect().height); }
+  let slideTok=0, slideGoal=null;
+  function settle(n){ if (n===0 && !state.result) n=1; slideTok++; slideGoal=null; applyContent(n); sheetSt=n; sheet.classList.remove('sliding','al-b'); sheet.style.transition=''; sheet.style.height=''; const sc=$('scroll'); if (sc) sc.scrollTop=0; }
+  function slideTo(n, fromH, contentFrom, toH){
+    const tok=++slideTok; slideGoal=n; const big=Math.max(n, contentFrom); if (toH===undefined) toH=natH(n);
+    applyContent(big); sheet.classList.add('sliding'); sheet.classList.toggle('al-b', Math.min(n,contentFrom)===0 && big===1);
+    sheet.style.transition='none'; sheet.style.height=fromH+'px'; void sheet.offsetHeight;
+    sheet.style.transition='height .28s cubic-bezier(.2,.8,.2,1)'; sheet.style.height=toH+'px';
+    setTimeout(() => { if (tok!==slideTok) return; settle(n); if (n===0) nudgeOnce(); }, 310);
+  }
+  function nudgeOnce(){ try { if (sessionStorage.getItem('nudged')) return; sessionStorage.setItem('nudged','1'); } catch (_) {} sheet.classList.add('nudge'); setTimeout(() => sheet.classList.remove('nudge'), 2600); }   // 처음 한 번, 카드가 살짝 들썩여 위로 끌 수 있다는 걸 알려 준다
+  function setSt(n, instant){
+    if (isDesk()) return; if (n===0 && !state.result) n=1;
+    const from=sheet.getBoundingClientRect().height, old=slideGoal!==null ? slideGoal : sheetSt;
+    if (instant || n===old || from<=0 || matchMedia('(prefers-reduced-motion: reduce)').matches){ settle(n); return; }
+    slideTo(n, from, old);
+  }
+  const foldIfResult = () => { if (state.result) setSt(0); };   // 고르기를 마치면 카드를 접어 지도를 크게 보여 준다
+  function syncStartUI(){ const has=!!state.start; $('startEdit').style.display = (!has || startEditing) ? '' : 'none'; $('startEditBtn').style.display = has ? '' : 'none'; $('startHint').style.display = has ? 'none' : ''; }
+  $('startEditBtn').onclick = () => { startEditing=!startEditing; syncStartUI(); setSt(1); };
+  const closeMenu = () => { $('menuPage').hidden=true; };
+  function setFs(n){ document.body.classList.remove('fs1','fs2'); if (n) document.body.classList.add('fs'+n); document.querySelectorAll('.fsrow .btn').forEach(b => b.classList.toggle('on', +b.dataset.fs===n)); try { localStorage.setItem('fs', String(n)); } catch (_) {} }
+  document.querySelectorAll('.fsrow .btn').forEach(b => b.onclick = () => setFs(+b.dataset.fs));
+  { let n=0; try { n=+localStorage.getItem('fs')||0; } catch (_) {} setFs(n); }
+  $('menuBtn').onclick = () => { $('menuPage').hidden=false; }; $('menuClose').onclick = closeMenu;
   function renderMain(){
+    syncStartUI(); if (!state.result && (sheetSt===0 || slideGoal===0)) setSt(1);
     const R = state.result, col = state.mode==='kid' ? '#ea6a12' : '#2563eb';
     const modeName = state.mode==='kid' ? '아이·노약자' : '휠체어·유모차';
     if (!state.start){ $('summary').innerHTML=''; $('detail').textContent='-'; $('locRow').style.display='none'; $('locBtn3').style.display=''; applyMore(); return; }
@@ -1028,7 +1114,7 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     const overTxt = st.up20>8.34 ? `오르막 최대 ${st.up20.toFixed(1)}%(한도 1/12=8.33%)` : `내리막 최대 ${st.dn20.toFixed(1)}%(한도 1/8=12.5%)`;
     const longNote = state.mode==='old' ? `<div class="note warnTxt" style="margin-top:8px">${R.res.over ? `<b>⚠ 이 길은 가는 방향으로 ${overTxt} 구간이 있습니다. 경사 한도 안으로 갈 수 있는 길을 찾지 못해, 계단 면만 피한 가장 가까운 길을 보여 줍니다. 휠체어로 가기 어려울 수 있으니 실제로 확인하세요.</b> ` : ''}계단 면(수치지도)을 6m 이상 피한 길입니다${R.res.over ? '' : '. 20m 구간 경사가 한도(오르막 1/12=8.33%, 내리막 1/8=12.5%)를 넘는 길도 피했습니다'}. 경사는 가는 방향에 따라 오르막·내리막이 달라지므로 방향별로 따로 판정했습니다. <b>경사 각도</b>는 20m 구간의 높이 변화로 잰 값입니다(예: 3.6°는 100m를 가면 약 6.3m 오르는 경사, 6.3%). 휠체어 한도는 오르막 약 4.8°(8.33%), 내리막 약 7.1°(12.5%)이고 접근로 권장은 약 3.2°(5.56%)입니다. 경사로·엘리베이터 자료가 없어 휠체어로 실제 다닐 수 있는지는 확인되지 않았습니다.</div>` : '';
     $('summary').innerHTML = `<div class="sum"><div class="time">${mm(st.total/REF)===mm(sec) ? mm(sec) : mm(st.total/REF)+'~'+mm(sec)}<small>분</small></div><div><div class="dest">${p.kind==='wc'?'🚻 ':p.kind==='am'?p.icon+' ':''}${p.label}</div><div class="meta">${modeName} · ${Math.round(st.total)}m · 1.0~0.7m/s</div></div></div><div class="chips">${chips.join('')}</div><div class="sgrow"><button class="btn pri" id="guideBtn">▶ 안내 시작</button><button class="btn more" id="moreBtn" aria-expanded="false">자세히 보기 ▾</button></div><div id="moreBox" hidden><div class="profBox"><div class="profTtl">가는 길 높낮이</div>${profileSVG(st, col)}</div><div class="chips" style="margin:6px 0">${extra.join('')}</div>${longNote}${warn}</div>`;
-    $('moreBtn').onclick = () => { moreOpen = !moreOpen; applyMore(); }; $('guideBtn').onclick = () => guideStart(); applyMore();
+    $('moreBtn').onclick = () => { if (isDesk()){ moreOpen = !moreOpen; applyMore(); } else setSt(moreOpen ? 1 : 2); }; $('guideBtn').onclick = () => guideStart(); applyMore();
     let info = '';
     const rvNote = (state.mode==='old' && st.rvn.length) ? st.rvn.map(q => `${q.cls==='ok'?'🟢':q.cls==='block'?'🔴':'🟠'} ${q.note}`).join('<br>') : '';
     const offM = R.res.t.off||0; if (offM>8) info += `<span>도착 지점</span><span class="warnTxt">${p.kind==='wc'?'화장실':p.kind==='am'?p.sublabel:'장소'} 위치에서 약 ${Math.round(offM)}m 떨어진 길 끝까지 안내(계단을 피하려고 가장 가까운 길로 이동)</span>`;
@@ -1049,13 +1135,13 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
       ${info}</div>`;
   }
   const GRP = {wc:['wc','acc','dia'], am:['dw','vm','st'], gt:['gp']};
-  const SUBL = {wc:'🚻 가까운 화장실', acc:'♿ 장애인 화장실', dia:'🍼 기저귀 교환대', dw:'🚰 음수대', vm:'🥤 자판기', st:'🏪 매점'};
+  const SUBL = {wc:'🚻 전체', acc:'♿ 장애인', dia:'🍼 기저귀대', dw:'🚰 음수대', vm:'🥤 자판기', st:'🏪 매점'};
   const grpOf = () => state.dest==='none' ? 'none' : state.dest==='lm' ? 'lm' : (GRP.wc.includes(state.fac) ? 'wc' : GRP.am.includes(state.fac) ? 'am' : 'gt');
-  function renderWcOpt(){ const gn=$('gpNote'); if (gn) gn.style.display = (state.dest==='wc' && state.fac==='gp') ? '' : 'none';
+  function renderWcOpt(){ const gn=$('gpHint'); if (gn) gn.style.display = (state.dest==='wc' && state.fac==='gp') ? '' : 'none';
     const g=grpOf(); document.querySelectorAll('#facGrid button[data-g]').forEach(b => b.classList.toggle('on', b.dataset.g===g));
     const row=$('subRow'); if (row){ const L = GRP[g] && GRP[g].length>1 ? GRP[g] : [];
       row.innerHTML = L.map(f => `<button data-f="${f}" class="${state.fac===f?'on':''}">${SUBL[f]}</button>`).join('');
-      row.querySelectorAll('button').forEach(b => b.onclick = () => { state.fac=b.dataset.f; setDest('wc'); compute(false); }); } }
+      row.querySelectorAll('button').forEach(b => b.onclick = () => { state.fac=b.dataset.f; setDest('wc'); compute(false); foldIfResult(); }); } }
 
   // ---------- compute ----------
   function compute(focus){
@@ -1205,9 +1291,9 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     let nw = opts.cell; if (PLAZA[r*W+c]) nw = [r,c]; else if (!nw || !(flags[nw[0]*W+nw[1]]&(128|4))) nw = nearestPath(r, c, 45) || nw || nearestWalk(r, c, false, 45);   // 장소·시설에서 출발해도 가장 가까운 길 위에서 시작
     if (!nw){ toast('근처(90m 안)에 걸을 수 있는 길이 없어요. 길 위를 눌러 주세요.'); return false; }
     const cq = CEN[nw[0]*W+nw[1]]; state.start = {r:nw[0], c:nw[1], x:(nw[1]+(cq?(cq>>4)/15:0.5))*S, y:(nw[0]+(cq?(cq&15)/15:0.5))*S, exclude: opts.exclude || null};
-    $('startTxt').textContent = label || '지도에서 고른 지점';
+    $('startTxt').textContent = label || '지도에서 고른 지점'; startEditing=false;
     if (!opts.keepFrom) $('fromSel').value = '';
-    zoomStartFlag = opts.focus !== false; compute(opts.focus !== false); zoomStartFlag = false;
+    zoomStartFlag = opts.focus !== false; compute(opts.focus !== false); zoomStartFlag = false; if (opts.focus !== false) foldIfResult();
     return true;
   }
   for (const k of OPENBOX){ if ((flags[k]&1) && !(flags[k]&2)) flags[k] |= 8; }   // 위에서 막음을 푼 칸은 길 면으로(휠체어 통행 가능)
@@ -1296,14 +1382,14 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     $('popGo').onclick = () => { pop.style.display='none';
       if (p.kind==='lm'){ setDest('lm'); state.lm=p.id; $('lmSel').value=p.id; }
       else { setDest('lm'); state.lm=p.id; $('lmSel').value=p.id; }
-      if (!state.start) toast('출발점을 먼저 골라 주세요. 지도를 누르면 됩니다.'); else compute(true); };
+      if (!state.start) toast('출발점을 먼저 골라 주세요. 지도를 누르면 됩니다.'); else { compute(true); foldIfResult(); } };
     $('popFrom').onclick = () => { pop.style.display='none';
       setStart(p.x, p.y, p.name + ' 앞', {cell:[p.r,p.c], exclude: p.kind==='wc'? p.id : null}); };
   }
 
   // ---------- controls wiring ----------
   function setMode(m){
-    state.mode=m; document.body.className=m;
+    state.mode=m; document.body.classList.remove('kid','old'); document.body.classList.add(m);
     document.querySelectorAll('.seg button').forEach(b => b.classList.toggle('on', b.dataset.mode===m));
     if (m==='old' && state.fac==='wc') state.fac='acc'; else if (m==='kid' && state.fac==='acc') state.fac='wc';
     renderWcOpt(); compute();
@@ -1318,13 +1404,13 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
       state.lm=null; $('lmSel').value=''; $('q3').value=''; setDest('none'); compute(false); return; }
     if (g==='lm'){ setDest('lm'); if (!state.lm){ $('q3').focus(); state.result=null; state.cands=[]; render(); drawRoute(); } else compute(true); return; }
     if (!GRP[g].includes(state.fac) || state.dest==='lm' || state.dest==='none') state.fac = g==='wc' ? (state.mode==='old'?'acc':'wc') : GRP[g][0];
-    setDest('wc'); compute(false);
+    setDest('wc'); compute(false); if (g==='gt') foldIfResult();
   });
   // landmark selects (grouped)
   const groups = {}; places.filter(p=>p.kind==='lm').forEach(p => (groups[p.cat]=groups[p.cat]||[]).push(p));
   const opt = (sel, first) => { sel.innerHTML = `<option value="">${first}</option>`; for (const c of ['공연·경기장','광장·쉼터','전시·역사','다리']){ if (!groups[c]) continue; const g=document.createElement('optgroup'); g.label=CATI[c]+' '+c; groups[c].sort((a,b)=>a.label.localeCompare(b.label,'ko')).forEach(p => { const o=document.createElement('option'); o.value=p.id; o.textContent=p.name; g.appendChild(o); }); sel.appendChild(g); } };
   opt($('lmSel'), '도착할 장소를 고르세요'); opt($('fromSel'), '장소 목록에서 고르기…');
-  $('lmSel').onchange = e => { state.lm = e.target.value || null; const pp=byId[state.lm]; $('q3').value = pp ? pp.name : ''; compute(true); };
+  $('lmSel').onchange = e => { state.lm = e.target.value || null; const pp=byId[state.lm]; $('q3').value = pp ? pp.name : ''; compute(true); foldIfResult(); };
   // 도착 장소 이름 검색
   (function(){
     const qi=$('q3'), qr=$('qres3'); const nm=t=>(t||'').toString().replace(/[\s·()（）\-_.,]/g,'').toLowerCase();
@@ -1332,7 +1418,7 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
       const hits=places.filter(p=>p.kind==='lm').map(p=>{ const a=nm(p.name), l=nm(p.label); const i=Math.min(...[a.indexOf(q), l.indexOf(q)].map(x=>x<0?99:x)); return {p,i}; }).filter(h=>h.i<99).sort((a,b)=>a.i-b.i).slice(0,8);
       qr.innerHTML = hits.length ? hits.map(h=>`<button data-id="${h.p.id}"><span>${CATI[h.p.cat]||'📍'}</span><span>${h.p.name}</span><span class="tag">${h.p.cat}</span></button>`).join('') : '<div style="padding:12px 14px;color:var(--sub);font-size:14px">검색 결과가 없어요.</div>';
       qr.style.display='block';
-      qr.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const p=byId[b.dataset.id]; qr.style.display='none'; qi.value=p.name; qi.blur(); state.lm=p.id; $('lmSel').value=p.id; compute(true); }); }
+      qr.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const p=byId[b.dataset.id]; qr.style.display='none'; qi.value=p.name; qi.blur(); state.lm=p.id; $('lmSel').value=p.id; compute(true); foldIfResult(); }); }
     qi.addEventListener('input',show); qi.addEventListener('focus',show);
     qi.addEventListener('keydown',e=>{ if (e.key==='Enter'){ const b=qr.querySelector('button'); if (b){ e.preventDefault(); b.click(); } } });
     document.addEventListener('pointerdown',e=>{ if (!e.target.closest('#lmSearch')) qr.style.display='none'; });
@@ -1476,7 +1562,42 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
   const sheet=$('sheet'); let sheetOpen=false;
   const peekH = () => Math.min(360, Math.round(innerHeight*0.44));   // '내 위치로 찾기'와 요약이 스크롤 없이 한눈에 보이는 높이
   const openH = peekH;
-  function setSheet(open){ sheetOpen=open; const h = open ? openH() : peekH(); document.documentElement.style.setProperty('--sheetH', h+'px'); fitOffset(); }
+  function setSheet(){ const h=Math.round(sheet.getBoundingClientRect().height); if (h>0){ document.documentElement.style.setProperty('--sheetH', h+'px'); fitOffset(); } }   // 카드 높이는 내용에 맞춰 저절로 정해지고, 지도 위치는 그 높이를 따라간다
+  new ResizeObserver(() => setSheet()).observe(sheet);
+  // ---------- ☰ 메뉴: 검색과 바로가기 ----------
+  function flyTo(p){ const d=230, z=Y(zD(p.x,p.y)); controls.target.set(p.x, z, p.y); camera.position.set(p.x+d*0.07, z+d*0.83, p.y+d*0.55); controls.update(); }
+  $('mLoc').onclick = () => { closeMenu(); locate(); };
+  $('mZoom').onclick = () => { closeMenu(); zoomMe(); };
+  $('mHome').onclick = () => { closeMenu(); $('pop').style.display='none'; $('homeBtn').click(); };
+  (function(){
+    const qi=$('q4'), qr=$('qres4'); const nm=t=>(t||'').toString().replace(/[\s·()（）\-_.,]/g,'').toLowerCase();
+    const pool = () => places.concat(amenPlaces);
+    function tagOf(p){ return p.kind==='wc' ? '화장실' : p.kind==='am' ? p.sublabel : p.cat; }
+    function iconOf(p){ return p.kind==='wc' ? '🚻' : p.kind==='am' ? p.icon : (CATI[p.cat]||'📍'); }
+    function show(){ const q=nm(qi.value); if (!q){ qr.style.display='none'; return; }
+      const hits=pool().map(p=>{ const a=nm(p.name), l=nm(p.label); const i=Math.min(...[a.indexOf(q), l.indexOf(q)].map(x=>x<0?99:x)); return {p,i}; }).filter(h=>h.i<99).sort((a,b)=>a.i-b.i).slice(0,10);
+      qr.innerHTML = hits.length ? hits.map((h,k)=>`<button data-k="${k}"><span>${iconOf(h.p)}</span><span>${h.p.name}</span><span class="tag">${tagOf(h.p)}</span></button>`).join('') : '<div style="padding:12px 14px;color:var(--sub);font-size:14px">검색 결과가 없어요.</div>';
+      qr.style.display='block';
+      qr.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const p=hits[+b.dataset.k].p; qr.style.display='none'; qi.value=''; closeMenu(); flyTo(p); openPop(p); }); }
+    qi.addEventListener('input',show); qi.addEventListener('focus',show);
+    qi.addEventListener('keydown',e=>{ if (e.key==='Enter'){ const b=qr.querySelector('button'); if (b){ e.preventDefault(); b.click(); } } });
+    document.addEventListener('pointerdown',e=>{ if (!e.target.closest('#mSearch')) qr.style.display='none'; });
+  })();
+  // 손잡이를 손가락으로 끌면 카드가 따라 움직이고, 놓으면 가까운 단계로 미끄러져 멈춘다(누르면 중간↔접힘). 아예 사라지지는 않는다.
+  { const g=$('grab'); let d=null;
+    g.addEventListener('pointerdown', e => { if (isDesk()) return; if (slideGoal!==null) settle(slideGoal); try { g.setPointerCapture(e.pointerId); } catch (_) {}
+      const s0=sheetSt, lo=state.result?0:1, startH=Math.round(sheet.getBoundingClientRect().height), HS=[]; for (let n=lo;n<=2;n++) HS[n]=natH(n);
+      applyContent(s0); sheet.style.transition='none'; sheet.style.height=startH+'px'; d={y0:e.clientY, s:s0, lo, HS, startH, t:null}; });
+    g.addEventListener('pointermove', e => { if (!d) return; const dy=e.clientY-d.y0; if (Math.abs(dy)<4) return;
+      const t = dy<0 ? d.s+1 : d.s-1;
+      if (t>2 || t<d.lo){ sheet.style.height=d.startH+'px'; return; }
+      if (d.t!==t){ d.t=t; applyContent(Math.max(d.s,t)); sheet.classList.add('sliding'); sheet.classList.toggle('al-b', Math.min(d.s,t)===0 && Math.max(d.s,t)===1); sheet.style.transition='none'; }
+      const a=d.HS[d.s], b=d.HS[t]; sheet.style.height=Math.min(Math.max(d.startH-dy, Math.min(a,b)), Math.max(a,b))+'px'; });
+    g.addEventListener('pointerup', e => { if (!d) return; const dd=d; d=null; const dy=e.clientY-dd.y0, cur=Math.round(sheet.getBoundingClientRect().height);
+      if (dd.t===null || Math.abs(dy)<6){ settle(dd.s); setSt(dd.s===0 ? 1 : dd.s===1 ? (state.result ? 0 : 2) : 1); return; }
+      const gap=Math.abs(dd.HS[dd.t]-dd.HS[dd.s])||1, prog=Math.abs(cur-dd.HS[dd.s])/gap, n = prog>0.3 ? dd.t : dd.s;
+      slideTo(n, cur, Math.max(dd.s,dd.t), dd.HS[n]); });
+    g.addEventListener('pointercancel', () => { if (d){ const s0=d.s; d=null; settle(s0); } }); }
   const isDesk = () => innerWidth >= 900;
   let gy=null, gh=0;
   ['gesturestart','gesturechange'].forEach(t => document.addEventListener(t, e => e.preventDefault()));   // iPhone: 화면 전체 두 손가락 확대 방지
@@ -1549,7 +1670,7 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
   });
 
   addEventListener('resize', () => { if (!isDesk()) setSheet(sheetOpen); else fitOffset(); });
-  setSheet(false); fitOffset(); placeAll(); renderWcOpt(); setDest('wc');
+  setSheet(false); setSt(1); fitOffset(); placeAll(); renderWcOpt(); setDest('wc');
   (function loop(){ guideFrame(); controls.update(); renderer.render(scene, camera);
     { const cd=camera.position.distanceTo(controls.target), nw=rwFor(cd); if (Math.abs(Math.log(nw/rw))>0.2){ rw=nw; drawRoute(); } }
     updLabels(); requestAnimationFrame(loop); })();
