@@ -417,6 +417,8 @@ const D = {"S": 2.0, "W": 900, "H": 770, "ES": 4.0, "EW": 451, "EH": 386, "zmin"
 const SPEED = 0.7, REF = 1.0;
 const CATC = {'공연·경기장':'#7c3aed','광장·쉼터':'#16865a','전시·역사':'#b45309','다리':'#0e7490','기관·숙박':'#475569'};
 const CATI = {'공연·경기장':'🎭','광장·쉼터':'🌳','전시·역사':'🏛','다리':'🌉','기관·숙박':'🏢'};
+// 사용자 요청(2026-11-26): 아래 경기장은 분류 아이콘(🎭) 대신 종목 아이콘을 쓴다(이름은 화면에 보이는 이름 기준).
+const SPORT = {'올림픽수영장':'🏊','KSPO DOME·올림픽체조경기장':'🤸','벨로드롬·올림픽사이클경기장':'🚴','티켓링크 라이브 아레나·핸드볼경기장':'🤾','올림픽테니스경기장':'🎾','실내테니스장':'🎾','우리금융아트홀·올림픽역도경기장':'🏋️','3대3 농구장':'🏀'};
 const $ = id => document.getElementById(id);
 const fmt = s => { let m = Math.floor(s/60), r = Math.round(s%60); if (r===60){m++;r=0;} return m ? `${m}<small>분</small> ${r}<small>초</small>` : `${r}<small>초</small>`; };
 const mm = s => Math.max(1, Math.round(s/60));
@@ -703,7 +705,7 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     el.className = 'lb' + (p.kind==='wc' ? ' wc' : '');
     const c = p.kind==='wc' ? '#d6246e' : CATC[p.cat];
     el.style.setProperty('--lc', c);
-    const ic = p.kind==='wc' ? '🚻' : CATI[p.cat];
+    const ic = p.kind==='wc' ? '🚻' : (SPORT[p.name]||CATI[p.cat]);
     el.innerHTML = `<span class="ico">${ic}</span><span class="t">${p.label}${p.kind==='wc' && hasAcc(p.d) ? ' ♿' : ''}</span>`;
     el.addEventListener('click', ev => { ev.stopPropagation(); openPop(p); });
     document.body.appendChild(el); p.el = el;
@@ -1463,7 +1465,7 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     else if (p.kind==='bd') body = `<div class="note">수치지도 건물${p.bu?' · '+p.bu:''}${p.bf?' · '+p.bf+'층':''} · 이름 정보가 없는 건물입니다. 가장 가까운 길을 기준으로 안내합니다.</div>`;
     else if (p.kind==='am') body = `<div class="note">${p.where}${p.note?' · '+p.note:''}<br>${p.src}</div>`;
     else body = `<div class="note">${p.cat} · ${p.d && p.d.guide ? '이름은 올림픽공원 종합안내도, 위치는 수치지도 건물 기준' : '위치는 편의시설 자료 좌표 기준'}</div>`;
-    pop.innerHTML = `<h4>${p.kind==='wc'?'🚻 ':p.kind==='am'?p.icon+' ':p.kind==='bd'?'🏢 ':CATI[p.cat]+' '}${p.name}</h4>${body}
+    pop.innerHTML = `<h4>${p.kind==='wc'?'🚻 ':p.kind==='am'?p.icon+' ':p.kind==='bd'?'🏢 ':(SPORT[p.name]||CATI[p.cat])+' '}${p.name}</h4>${body}
       <div class="row">${state.start ? '<button class="btn pri" id="popGo">도착지로 설정</button><button class="btn" id="popFrom">출발지 바꾸기</button>' : '<button class="btn pri" id="popFrom">여기서 출발</button><button class="btn" id="popGo">도착지로 설정</button>'}<button class="btn" id="popX" aria-label="닫기">✕</button></div>`;
     pop.style.display='block';
     $('popX').onclick = () => pop.style.display='none';
@@ -1504,7 +1506,7 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     const qi=$('q3'), qr=$('qres3'); const nm=t=>(t||'').toString().replace(/[\s·()（）\-_.,]/g,'').toLowerCase();
     function show(){ const q=nm(qi.value); if (!q){ qr.style.display='none'; return; }
       const hits=places.filter(p=>p.kind==='lm').map(p=>{ const a=nm(p.name), l=nm(p.label); const i=Math.min(...[a.indexOf(q), l.indexOf(q)].map(x=>x<0?99:x)); return {p,i}; }).filter(h=>h.i<99).sort((a,b)=>a.i-b.i).slice(0,8);
-      qr.innerHTML = hits.length ? hits.map(h=>`<button data-id="${h.p.id}"><span>${CATI[h.p.cat]||'📍'}</span><span>${h.p.name}</span><span class="tag">${h.p.cat}</span></button>`).join('') : '<div style="padding:12px 14px;color:var(--sub);font-size:14px">검색 결과가 없어요.</div>';
+      qr.innerHTML = hits.length ? hits.map(h=>`<button data-id="${h.p.id}"><span>${SPORT[h.p.name]||CATI[h.p.cat]||'📍'}</span><span>${h.p.name}</span><span class="tag">${h.p.cat}</span></button>`).join('') : '<div style="padding:12px 14px;color:var(--sub);font-size:14px">검색 결과가 없어요.</div>';
       qr.style.display='block';
       qr.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const p=byId[b.dataset.id]; qr.style.display='none'; qi.value=p.name; qi.blur(); state.lm=p.id; $('lmSel').value=p.id; compute(true); foldIfResult(); }); }
     qi.addEventListener('input',show); qi.addEventListener('focus',show);
@@ -1700,7 +1702,7 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     const qi=$('q4'), qr=$('qres4'); const nm=t=>(t||'').toString().replace(/[\s·()（）\-_.,]/g,'').toLowerCase();
     const pool = () => places.concat(amenPlaces);
     function tagOf(p){ return p.kind==='wc' ? '화장실' : p.kind==='am' ? p.sublabel : p.cat; }
-    function iconOf(p){ return p.kind==='wc' ? '🚻' : p.kind==='am' ? p.icon : (CATI[p.cat]||'📍'); }
+    function iconOf(p){ return p.kind==='wc' ? '🚻' : p.kind==='am' ? p.icon : (SPORT[p.name]||CATI[p.cat]||'📍'); }
     function show(){ const q=nm(qi.value); if (!q){ qr.style.display='none'; return; }
       const hits=pool().map(p=>{ const a=nm(p.name), l=nm(p.label); const i=Math.min(...[a.indexOf(q), l.indexOf(q)].map(x=>x<0?99:x)); return {p,i}; }).filter(h=>h.i<99).sort((a,b)=>a.i-b.i).slice(0,10);
       qr.innerHTML = hits.length ? hits.map((h,k)=>`<button data-k="${k}"><span>${iconOf(h.p)}</span><span>${h.p.name}</span><span class="tag">${tagOf(h.p)}</span></button>`).join('') : '<div style="padding:12px 14px;color:var(--sub);font-size:14px">검색 결과가 없어요.</div>';
