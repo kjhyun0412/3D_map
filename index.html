@@ -525,7 +525,7 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     for (let h=0; h<q.length; h++){ const u=q[h], r=(u/W)|0, c=u-r*W, d=DC[u]; if (d>=6) continue;
       for (let dr=-1;dr<=1;dr++) for (let dc=-1;dc<=1;dc++){ const rr=r+dr, cc=c+dc; if (rr<0||rr>=H||cc<0||cc>=W) continue; const v=rr*W+cc; if ((flags[v]&8) && DC[v]===255){ DC[v]=d+1; q.push(v); } } } }
   const state = {mode:'kid', dest:'wc', fac:'wc', lm:null, start:null, result:null, cands:[], selIdx:0};
-  const guide = {on:false, follow:true, northUp:false, pending:false, hd:0, px:0, py:0, idx:0, t:0};   // 안내 중 상태: 안내 중에는 지도에서 지점을 골라도 경로가 바뀌지 않는다
+  const guide = {on:false, follow:true, northUp:false, pending:false, hd:0, px:0, py:0, idx:0, t:0, qx:0, qy:0, th:0, turn:false, last:0, easeT:0, view:false};   // 안내 중 상태: 안내 중에는 지도에서 지점을 골라도 경로가 바뀌지 않는다
 
   function zAt(x, y){
     const fx = Math.min(Math.max(x/ES,0),EW-1.001), fy = Math.min(Math.max(y/ES,0),EH-1.001);
@@ -1244,6 +1244,7 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
       let ts = AMF[state.fac] ? amenPlaces.filter(p => p.sub===state.fac) : places.filter(p => p.kind==='wc' && p.id!==state.start.exclude);
       if (state.fac==='acc') ts = ts.filter(p => hasAcc(p.d));
       if (state.fac==='dia') ts = ts.filter(p => hasDia(p.d));
+      if (state.only) ts = ts.filter(p => p===state.only);   // 경로를 벗어나 다시 찾을 때: 가던 도착지만 찾는다
       targets = ts.map(p => { let c=[p.r,p.c]; if (!okCell(c[0],c[1],sf) || !bigCell(c[0],c[1])) c = nearestWalk(p.r,p.c,sf,24,true) || (okCell(c[0],c[1],sf) ? c : nearestWalk(p.r,p.c,sf,24)); return c ? {cell:c[0]*W+c[1], p, off:Math.hypot(c[0]-p.r,c[1]-p.c)*S} : null; }).filter(Boolean);
     } else if (state.lm){
       const p = byId[state.lm]; let cell = [p.r, p.c];
@@ -1365,9 +1366,9 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
   function setStart(x, y, label, opts={}){
     if (guide.on) return false;
     const r=Math.floor(y/S), c=Math.floor(x/S);
-    if (r<0||r>=H||c<0||c>=W){ toast('공원 지도 밖입니다.'); return false; }
+    if (r<0||r>=H||c<0||c>=W){ if (!opts.quiet) toast('공원 지도 밖입니다.'); return false; }
     let nw = opts.cell; if (PLAZA[r*W+c]) nw = [r,c]; else if (!nw || !(flags[nw[0]*W+nw[1]]&(128|4)) || !bigCell(nw[0],nw[1])) nw = nearestPath(r, c, 45, true) || nearestPath(r, c, 45) || nw || nearestWalk(r, c, false, 45);   // 장소·시설에서 출발해도 가장 가까운 길 위에서 시작
-    if (!nw){ toast('근처(90m 안)에 걸을 수 있는 길이 없어요. 길 위를 눌러 주세요.'); return false; }
+    if (!nw){ if (!opts.quiet) toast('근처(90m 안)에 걸을 수 있는 길이 없어요. 길 위를 눌러 주세요.'); return false; }
     const cq = CEN[nw[0]*W+nw[1]]; state.start = {r:nw[0], c:nw[1], x:(nw[1]+(cq?(cq>>4)/15:0.5))*S, y:(nw[0]+(cq?(cq&15)/15:0.5))*S, exclude: opts.exclude || null};
     $('startTxt').textContent = label || '지도에서 고른 지점'; startEditing=false;
     if (!opts.keepFrom) $('fromSel').value = '';
@@ -1446,10 +1447,11 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
         d.dataset.i=k; d.style.display='block'; d.style.left=sp[0]+'px'; d.style.top=sp[1]+'px'; d.style.background=col; d.classList.toggle('on', sel);
         d.textContent = rng(c.st.total); d.title = `${c.res.t.p.label} · ${Math.round(c.st.total)}m`;
       }); }
-    if (gps.fix && gps.snap){ const sp=proj(gps.snap.x, gps.snap.y, Y(zD(gps.snap.x,gps.snap.y))+3), rp=proj(gps.fix.x, gps.fix.y, Y(zD(gps.fix.x,gps.fix.y))+3), e=proj(gps.fix.x+gps.fix.acc, gps.fix.y, Y(zD(gps.fix.x,gps.fix.y))+3);
+    if (gps.fix && gps.snap){ const mx=guide.on ? guide.px : gps.snap.x, my=guide.on ? guide.py : gps.snap.y, ox=guide.on ? mx : gps.fix.x, oy=guide.on ? my : gps.fix.y;
+      const sp=proj(mx, my, Y(zD(mx,my))+3), rp=proj(ox, oy, Y(zD(ox,oy))+3), e=proj(ox+gps.fix.acc, oy, Y(zD(ox,oy))+3);
       if (sp && rp && e){ gdot.style.display='block'; gdot.style.left=sp[0]+'px'; gdot.style.top=sp[1]+'px'; const ac=gdot.firstChild, R=Math.min(guide.on?36:70, Math.max(10, Math.hypot(e[0]-rp[0], e[1]-rp[1]))); ac.style.width=ac.style.height=(R*2)+'px'; ac.style.left=(rp[0]-sp[0])+'px'; ac.style.top=(rp[1]-sp[1])+'px';
         const cn=gdot.children[1];   // 바라보는 방향(작은 화살표): 지도 위 방향을 화면 각도로 바꿔 그린다(지도를 돌려도 맞게)
-        if (gps.heading===null) cn.style.display='none'; else { const hr=gps.heading*Math.PI/180, z0=Y(zD(gps.snap.x,gps.snap.y))+3, hp=proj(gps.snap.x+12*Math.sin(hr), gps.snap.y-12*Math.cos(hr), z0);
+        if (gps.heading===null) cn.style.display='none'; else { const hr=(guide.on ? guide.th : gps.heading)*Math.PI/180, z0=Y(zD(mx,my))+3, hp=proj(mx+12*Math.sin(hr), my-12*Math.cos(hr), z0);
           if (hp){ cn.style.display='block'; cn.style.transform='rotate('+(Math.atan2(hp[0]-sp[0], -(hp[1]-sp[1]))*180/Math.PI).toFixed(1)+'deg)'; } else cn.style.display='none'; } } else gdot.style.display='none'; } else gdot.style.display='none';
     // start / destination pins
     if (state.start && !guide.on){ const sp=proj(state.start.x, state.start.y, Y(zD(state.start.x,state.start.y))+6); if (sp){ pinS.style.display='block'; pinS.style.left=sp[0]+'px'; pinS.style.top=sp[1]+'px'; } else pinS.style.display='none'; } else pinS.style.display='none';
@@ -1549,7 +1551,8 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     if (x<0||y<0||x>WM||y>HM){ gps.fix=null; guide.pending=false; if (!gps.said){ gps.said=true; toast('지금 위치가 올림픽공원 지도 밖이에요. 공원 안에서 다시 눌러 주세요.', 4000); } return; }
     gps.said=false; gps.fix={x, y, acc:pos.coords.accuracy};
     { const c=pos.coords; let hd = (typeof c.heading==='number' && !isNaN(c.heading) && typeof c.speed==='number' && c.speed>=0.7) ? c.heading : null;
-      if (hd===null && gps.last && Math.hypot(x-gps.last.x, y-gps.last.y)>=5){ hd=(Math.atan2(x-gps.last.x, -(y-gps.last.y))*180/Math.PI+360)%360; }   // 속도 값이 없는 기기: 이전 위치에서 5m 넘게 움직였으면 이동 방향으로
+      const still = typeof c.speed==='number' && c.speed<0.7;   // 서 있다고 알려 주는 기기에서는 위치 흔들림을 걷는 방향으로 보지 않는다(나침반을 쓴다)
+      if (hd===null && !still && gps.last && Math.hypot(x-gps.last.x, y-gps.last.y)>=5){ hd=(Math.atan2(x-gps.last.x, -(y-gps.last.y))*180/Math.PI+360)%360; }   // 속도 값이 없는 기기: 이전 위치에서 5m 넘게 움직였으면 이동 방향으로
       if (hd!==null){ gps.gpsT=performance.now(); setHeading(hd); }
       if (!gps.last || Math.hypot(x-gps.last.x, y-gps.last.y)>=5) gps.last={x,y}; }
     const r=Math.floor(y/S), c=Math.floor(x/S), nw = nearestWalk(r, c, false, 15);   // 점은 가장 가까운 길 위(30m 안)에 맞춘다
@@ -1583,21 +1586,59 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     $('gStat').textContent = rem<20 ? '도착했어요' : `${Math.round(rem)}m · ${t1===t2?t1:t1+'~'+t2}분`;
     const p=state.result.res.t.p; $('gDest').textContent = (p.kind==='wc'?'🚻 ':p.kind==='am'?p.icon+' ':'')+p.label;
   }
+  // ---------- 경로를 벗어나면 알림 창 없이 자동으로 길을 다시 찾는다 ----------
+  // 안내 중 내 위치가 경로에서 30m 넘게(GPS 오차 최대 30m의 절반은 빼고) 6초 넘게, 위치를 3번 이상 받는 동안 벗어나 있으면 같은 도착지로 가는 길을 지금 위치에서 다시 계산한다.
+  // 위치 오차가 50m를 넘으면 판단하지 않고, 한 번 시도한 뒤에는 10초가 지나고 그 자리에서 20m 넘게 움직여야 다시 시도한다.
+  const OFF_M=30, OFF_MS=6000, OFF_FIXES=3, OFF_ACC=50, OFF_GAP=10000, OFF_MOVE=20, offR={since:0, n:0, fix:null, at:0, x:0, y:0};
+  function offReset(){ offR.since=0; offR.n=0; offR.fix=null; offR.at=0; }
+  function routeDist(x, y){ const P=state.result.st.pts; let best=Math.hypot(x-P[0].x, y-P[0].y);
+    for (let i=1;i<P.length;i++){ const a=P[i-1], b=P[i], dx=b.x-a.x, dy=b.y-a.y, L=dx*dx+dy*dy, t=L ? Math.max(0, Math.min(1, ((x-a.x)*dx+(y-a.y)*dy)/L)) : 0; best=Math.min(best, Math.hypot(x-a.x-dx*t, y-a.y-dy*t)); }
+    return best; }
+  function offCheck(){
+    const fx=gps.fix; if (!guide.on || !fx || !state.result || fx.acc>OFF_ACC){ offR.since=0; return; }
+    const slack=Math.min(fx.acc||0, 30)/2, dp=state.result.res.t.p;
+    if (routeDist(fx.x, fx.y)-slack<=OFF_M || Math.hypot(fx.x-dp.x, fx.y-dp.y)-slack<=OFF_M){ offR.since=0; return; }   // 경로 위이거나 도착지 바로 곁
+    const now=performance.now(); if (!offR.since){ offR.since=now; offR.n=0; offR.fix=null; }
+    if (fx!==offR.fix){ offR.fix=fx; offR.n++; }
+    if (now-offR.since<OFF_MS || offR.n<OFF_FIXES) return;
+    if (offR.at && (now-offR.at<OFF_GAP || Math.hypot(fx.x-offR.x, fx.y-offR.y)<OFF_MOVE)) return;
+    offR.since=0; offR.at=now; offR.x=fx.x; offR.y=fx.y; reroute();
+  }
+  function reroute(){   // 도착지는 그대로 두고 내 위치를 새 출발점으로 길을 다시 계산한다. 길이 없거나 경고가 붙는 참고용 길만 나오면 기존 경로를 그대로 둔다.
+    const fx=gps.fix, old=state.result, target=old.res.t.p, warn = c => !!(c.res.over || c.res.halo);
+    const keep={start:state.start, cands:state.cands, selIdx:state.selIdx, stairs:state.startStairs, txt:$('startTxt').textContent, from:$('fromSel').value};
+    guide.on=false; state.only=target;
+    let ok=false;
+    try { ok = setStart(fx.x, fx.y, `내 위치 (오차 약 ${Math.round(fx.acc)}m)`, {focus:false, quiet:true}) && !!state.result && state.result.res.t.p===target
+        && (!warn(state.result) || warn(old)) && (!state.startStairs || !!keep.stairs); }
+    finally { state.only=null; guide.on=true; }
+    if (ok){ guide.idx=0; }
+    else { state.start=keep.start; state.cands=keep.cands; state.result=old; state.selIdx=keep.selIdx; state.startStairs=keep.stairs; $('startTxt').textContent=keep.txt; $('fromSel').value=keep.from; render(); }
+    drawRoute(); updPins(); updateBar();
+  }
+  // 화면 흔들림 줄이기: ① 위치는 두 번에 걸쳐 부드럽게 옮기고 파란 점도 같은 자리를 쓴다 ② 방향은 한 번 걸러 낸 뒤 12° 넘게 달라질 때만 천천히 돈다
+  // ③ 따라가기가 자리를 잡은 뒤에는 카메라를 내 위치에 그대로 맞춰 점이 화면에서 밀렸다 당겨지지 않게 한다. 시간(초) 기준이라 기기의 화면 속도와 무관하다.
+  const POS_TAU=0.45, HEAD_TAU=0.8, TURN_TAU=0.6, TURN_START=12, TURN_STOP=2, TURN_MAX=60;
   function guideFrame(){
     if (!guide.on || !gps.snap) return;
-    guide.px += (gps.snap.x-guide.px)*0.12; guide.py += (gps.snap.y-guide.py)*0.12;   // GPS 점이 튀어도 화면은 부드럽게 따라간다
-    const th = guide.northUp ? 0 : (gps.heading!==null ? gps.heading : guide.hd), df=angDiff(th, guide.hd);
-    if (Math.abs(df)>2.5) guide.hd = (guide.hd + df*0.08 + 360)%360;   // 나침반 떨림은 작은 각도 무시 + 천천히 따라 돈다
+    const now=performance.now(), dt=Math.min(0.1, Math.max(0, (now-guide.last)/1000)), k = tau => 1-Math.exp(-dt/tau); guide.last=now;
+    guide.qx += (gps.snap.x-guide.qx)*k(POS_TAU); guide.qy += (gps.snap.y-guide.qy)*k(POS_TAU); guide.px += (guide.qx-guide.px)*k(POS_TAU); guide.py += (guide.qy-guide.py)*k(POS_TAU);
+    if (gps.heading!==null) guide.th = (guide.th + angDiff(gps.heading, guide.th)*k(HEAD_TAU) + 360)%360;
+    const df=angDiff(guide.northUp ? 0 : guide.th, guide.hd);
+    if (Math.abs(df)>TURN_START) guide.turn=true;
+    if (guide.turn){ const lim=TURN_MAX*dt; guide.hd = (guide.hd + Math.max(-lim, Math.min(lim, df*k(TURN_TAU))) + 360)%360; if (Math.abs(df)<TURN_STOP) guide.turn=false; }
+    if (!guide.follow || guide.view!==view2d){ guide.easeT=now; guide.view=view2d; }   // 다시 따라가기·2D/3D 전환 때는 부드럽게 옮겨 간다
+    const ea = Math.min(1, 0.12 + ((now-guide.easeT)/2000)**2);
     if (guide.follow){
       const hr=guide.hd*RAD, dx=Math.sin(hr), dy=-Math.cos(hr), gz=Y(zD(guide.px,guide.py)), BACK=55, UP=62, AHEAD=28;
       if (view2d){ const AH=14, D2=150;   // 2D 안내: 내 바로 위에서, 걷는 방향이 화면 위쪽이 되게 지도를 돌린다
-        v3b.set(guide.px+dx*AH, gz, guide.py+dy*AH); controls.target.lerp(v3b, 0.2);
-        v3b.set(guide.px+dx*AH-dx*D2*0.01, gz+D2*0.99995, guide.py+dy*AH-dy*D2*0.01); camera.position.lerp(v3b, 0.2); }
+        v3b.set(guide.px+dx*AH, gz, guide.py+dy*AH); controls.target.lerp(v3b, ea);
+        v3b.set(guide.px+dx*AH-dx*D2*0.01, gz+D2*0.99995, guide.py+dy*AH-dy*D2*0.01); camera.position.lerp(v3b, ea); }
       else {
-      v3b.set(guide.px+dx*AHEAD, gz, guide.py+dy*AHEAD); controls.target.lerp(v3b, 0.2);
-      v3b.set(guide.px-dx*BACK, gz+UP, guide.py-dy*BACK); camera.position.lerp(v3b, 0.2); }
+      v3b.set(guide.px+dx*AHEAD, gz, guide.py+dy*AHEAD); controls.target.lerp(v3b, ea);
+      v3b.set(guide.px-dx*BACK, gz+UP, guide.py-dy*BACK); camera.position.lerp(v3b, ea); }
     }
-    if (performance.now()-guide.t>400){ guide.t=performance.now(); updateBar(); }
+    if (performance.now()-guide.t>400){ guide.t=performance.now(); offCheck(); updateBar(); }
   }
   function guideStart(){
     if (!state.result){ toast('먼저 가고 싶은 곳을 골라 주세요.'); return; }
@@ -1616,20 +1657,21 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     $('gaNew').onclick = () => { ask.style.display='none'; setStart(gps.fix.x, gps.fix.y, `내 위치 (오차 약 ${Math.round(gps.fix.acc)}m)`, {focus:false}); if (state.result) guideBegin(); else toast('이 위치에서 갈 수 있는 곳을 찾지 못했어요.'); };
   }
   function guideBegin(){
-    guide.on=true; guide.follow=true; guide.northUp=false; guide.idx=0; guide.t=0; guide.px=gps.snap.x; guide.py=gps.snap.y;
+    offReset(); guide.on=true; guide.follow=true; guide.northUp=false; guide.idx=0; guide.t=0; guide.px=gps.snap.x; guide.py=gps.snap.y;
     remainInfo(); const P=state.result.st.pts, a=P[Math.min(guide.idx,P.length-1)], b=P[Math.min(guide.idx+6,P.length-1)];
     guide.hd = gps.heading!==null ? gps.heading : ((b.x!==a.x||b.y!==a.y) ? (Math.atan2(b.x-a.x, -(b.y-a.y))/RAD+360)%360 : 0);   // 방향을 모르면 처음엔 경로가 가는 쪽을 본다
+    guide.qx=guide.px; guide.qy=guide.py; guide.th=guide.hd; guide.turn=false; guide.last=guide.easeT=performance.now(); guide.view=view2d;
     document.body.classList.add('guiding'); $('pop').style.display='none'; $('guideBar').hidden=false; $('gRecenter').hidden=true; $('gNorth').textContent='🧭 북쪽 위로';
     controls.minDistance=30; lockAz(false); fitOffset(); drawRoute(); updateBar();
     toast('안내를 시작합니다. 폰을 돌리면 지도도 같이 돌아요.', 3500);
   }
   function guideEnd(){
-    guide.on=false; guide.pending=false; document.body.classList.remove('guiding'); $('guideBar').hidden=true; $('gAsk').style.display='none';
+    offReset(); guide.on=false; guide.pending=false; document.body.classList.remove('guiding'); $('guideBar').hidden=true; $('gAsk').style.display='none';
     controls.minDistance=160; lockAz(!view2d); fitOffset(); drawRoute(); focusRoute(); toast('안내를 취소했어요.'); setTimeout(layoutFab, 50);
   }
   $('gCancel').onclick = guideEnd;
   $('gRecenter').onclick = () => { guide.follow=true; $('gRecenter').hidden=true; };
-  $('gNorth').onclick = () => { guide.northUp=!guide.northUp; $('gNorth').textContent = guide.northUp ? '🧭 방향 따라 돌기' : '🧭 북쪽 위로'; };
+  $('gNorth').onclick = () => { guide.northUp=!guide.northUp; guide.turn=true; $('gNorth').textContent = guide.northUp ? '🧭 방향 따라 돌기' : '🧭 북쪽 위로'; };
   // 안내 중 손으로 지도를 끌거나 확대·축소하면 자동 따라가기를 멈춘다('내 위치'를 누르면 다시 따라간다)
   { let gd=null; const cv=renderer.domElement;
     cv.addEventListener('pointerdown', e => { gd=[e.clientX,e.clientY]; });
