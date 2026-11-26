@@ -1397,7 +1397,7 @@ const RVC = {block:{col:0xb3123a,name:'로드뷰 확인: 휠체어 진입 어려
     function pri(p){ if (p===dTarget) return 100; if (state.lm===p.id) return 90; return p.kind==='lm' ? (MAJOR.has(p.name)?30:p.cat==='공연·경기장'?25:20) : 60; }
     const camD = camera.position.distanceTo(controls.target);
     const facOK = p => { if (p.kind!=='wc' || state.dest!=='wc') return true; if (AMF[state.fac]) return false; if (state.fac==='acc') return hasAcc(p.d); if (state.fac==='dia') return hasDia(p.d); return true; };
-    const solo = guide.on && !!dTarget && dTarget.kind!=='lm';   // 화장실·편의시설로 안내 중에는 도착지 이름표만 보인다(다른 건물·장소 이름과 헷갈리지 않게)
+    const solo = guide.on && !!dTarget;   // 안내 중에는 도착지가 무엇이든 도착지 이름표만 보인다(다른 건물·장소 이름과 헷갈리지 않게)
     for (const p of order){
       const el=p.el, vis = solo ? p===dTarget : p===dTarget || state.lm===p.id || (p.kind==='lm' ? (showLM && (camD<=1300 || MAJOR.has(p.name))) : (near.has(p) || (showWC && facOK(p))));   // 멀리서는 주요 장소 이름만
       p.stem.visible = vis;
